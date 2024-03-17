@@ -23,7 +23,7 @@ public class SceneController {
     private Parent root;
 
     public void startGame(ActionEvent event) throws IOException {
-        new Game();
+        new GamePlay();
     }
 
 //    public void switchToScene1(ActionEvent event) throws IOException {

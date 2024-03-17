@@ -5,7 +5,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -13,20 +12,22 @@ import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-public class Game {
+public class GamePlay {
     Line line;
+
 //    TODO add borders ...
     Line upperBorderLine;
     Line LowerBorderLine;
+
     private final Pane pane;
     private Scene scene;
     private Circle circle;
-    private double totalVel = 4;
+    private final double totalVel = 4;
     private double velX;
     private double velY;
     private boolean isPaused;
 
-    private boolean isIncreasing;
+//    private boolean isIncreasing;
 
     Timeline animation = new Timeline(new KeyFrame(Duration.millis(16.63), event -> {
         circle.setTranslateX(circle.getTranslateX() + velX);
@@ -73,7 +74,7 @@ public class Game {
     }));
     private final Button pauseButton;
 
-    public Game() {
+    public GamePlay() {
         pane = new Pane();
         scene = new Scene(pane, 300, 500);
         Stage stage = new Stage();
