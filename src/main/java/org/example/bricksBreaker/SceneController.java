@@ -1,10 +1,8 @@
-package org.example.demo4;
+package org.example.bricksBreaker;
 
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 
@@ -22,9 +20,9 @@ public class SceneController {
     private Scene scene;
     private Parent root;
 
-    public void startGame(ActionEvent event) throws IOException {
-        new GamePlay();
-    }
+//    public void startGame(ActionEvent event) throws IOException {
+//        new GamePlay();
+//    }
 
 //    public void switchToScene1(ActionEvent event) throws IOException {
 //        root = FXMLLoader.load(getClass().getResource("scene2.fxml"));
@@ -44,6 +42,7 @@ public class SceneController {
     public void exit(ActionEvent event){
         stage = (Stage) scenePane.getScene().getWindow();
         stage.close();
+
     }
 
 }

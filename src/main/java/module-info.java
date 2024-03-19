@@ -3,6 +3,6 @@ module org.example.demo4 {
     requires javafx.fxml;
 
 
-    opens org.example.demo4 to javafx.fxml;
-    exports org.example.demo4;
+    opens org.example.bricksBreaker to javafx.fxml;
+    exports org.example.bricksBreaker;
 }

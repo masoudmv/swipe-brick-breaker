@@ -1,4 +1,4 @@
-package org.example.demo4;
+package org.example.bricksBreaker;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -17,7 +17,7 @@ public class Main extends Application {
 //            stage.setScene(scene);
 //            stage.show();
 
-            new mapGenerator();
+            new Game();
         } catch (Exception e){
             e.printStackTrace();
         }
