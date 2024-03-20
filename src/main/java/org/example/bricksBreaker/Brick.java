@@ -11,10 +11,6 @@ public class Brick {
     Label label;
     int points;
     int  currentPoints;
-//    int height;
-//    int width;
-//    int locationX;
-//    int locationY;
     static ArrayList<Brick> bricksList = new ArrayList<>();
 
     Brick(Rectangle r, int points){

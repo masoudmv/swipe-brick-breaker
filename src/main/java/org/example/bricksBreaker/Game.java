@@ -15,14 +15,18 @@ import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Game {
+    ArrayList <Ball> ballsList = new ArrayList<>();
+    boolean firstBallHitTheBottom = false;
+    double ballStartLocationX;
+    double ballStartLocationY;
 
-    private Circle circle;
+    private Circle firstCircle;
     private final double totalVel = 1;
-    private double velX;
-    private double velY;
     private boolean isPaused;
     Line line;
     private final Button pauseButton;
@@ -81,7 +85,6 @@ public class Game {
                 item.circle.setCenterY(100 + (double) brickHeight / 2);
                 item.circle.setRadius(8);
                 RegularItem.regularItems.add(item);
-//                pane.getChildren().add(item.circle);
 
             }
         }
@@ -95,8 +98,9 @@ public class Game {
 
     }));
 
-
     Timeline bricksMotion = new Timeline(new KeyFrame(Duration.millis(4), event -> {
+        pane.getChildren().remove(line);
+        pane.getChildren().add(line);
         for (RegularItem i : RegularItem.regularItems){
             i.circle.setCenterY(i.circle.getCenterY()+brickVel);
         }
@@ -107,49 +111,118 @@ public class Game {
             if (b.rectangle.getHeight() + b.rectangle.getY() >= scene.getHeight()-100){
                 brickVel = 0;
                 brickGenerator.stop();
+
             }
         }
 
     }));
 
     Timeline animation = new Timeline(new KeyFrame(Duration.millis(4), event -> {
-        circle.setTranslateX(circle.getTranslateX() + velX);
-        circle.setTranslateY(circle.getTranslateY() + velY);
+        for (Ball b : ballsList) {
 
-        boolean rightBorder = circle.getTranslateX() >= scene.getWidth() - circle.getRadius() - 0.1;
-        boolean leftBorder = circle.getTranslateX() <= circle.getRadius() + 0.1;
-        boolean topBorder = circle.getTranslateY() <= 100 + circle.getRadius() + 0.1;
-        boolean bottomBorder = circle.getTranslateY() >= scene.getHeight() - 100 - circle.getRadius() - 0.1;
+            Circle circle = b.circle;
+            circle.setTranslateX(circle.getTranslateX() + b.velX);
+            circle.setTranslateY(circle.getTranslateY() + b.velY);
 
-        if (bottomBorder || topBorder) {
-            velY *= -1;
-        }
-        if (rightBorder || leftBorder) {
-            velX *= -1;
-        }
+            boolean rightBorder = circle.getTranslateX() >= scene.getWidth() - circle.getRadius() - 0.1;
+            boolean leftBorder = circle.getTranslateX() <= circle.getRadius() + 0.1;
+            boolean topBorder = circle.getTranslateY() <= 100 + circle.getRadius() + 0.1;
+            boolean bottomBorder = circle.getTranslateY() - 1 >= scene.getHeight() - 100 - circle.getRadius() - 0.1;
+
+            if (topBorder) {
+                b.velY *= -1;
+            }
+            if (rightBorder || leftBorder) {
+                b.velX *= -1;
+            }
+
+            if (bottomBorder && Ball.numberOfBalls ==1 && b.inMotion) {
+
+                Ball.ballsHitTheBottom ++;
+                b.velY = 0;
+                b.velX = 0;
+                b.inMotion = false;
+                brickGenerator.play();
+                bricksMotion.play();
+                ballStartLocationX = b.circle.getTranslateX();
+                ballStartLocationY = b.circle.getTranslateY();
+                firstCircle = b.circle;
+                firstBallHitTheBottom = true;
+                scene.setOnMouseClicked(e -> {
+                    try {
+                        handleMouseClick(e.getX(), e.getY(), line, pane);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                });
 
 
 
+            }if (bottomBorder && firstBallHitTheBottom && Ball.ballsHitTheBottom+1 != Ball.numberOfBalls && b.inMotion) {
+                b.circle.setTranslateY(ballStartLocationY);
+                b.circle.setTranslateX(ballStartLocationX);
+                b.inMotion = false;
+                Ball.ballsHitTheBottom ++;
+                b.velY = 0;
+                b.velX = 0;
 
-        for (int i = 0; i < Brick.bricksList.size(); i++) {
-            Rectangle rect = Brick.bricksList.get(i).rectangle;
-            if(circle.getBoundsInParent().intersects(rect.getBoundsInParent())){
+            }  if (bottomBorder && firstBallHitTheBottom && Ball.ballsHitTheBottom+1 == Ball.numberOfBalls&& b.inMotion) {
+                b.circle.setTranslateY(ballStartLocationY);
+                b.circle.setTranslateX(ballStartLocationX);
+                b.inMotion = false;
 
-                boolean brickLeftBorder =Math.abs( circle.getTranslateX() + circle.getRadius()- rect.getX()) < 0.5;
-                boolean brickRightBorder = Math.abs(rect.getX()+brickWidth - circle.getTranslateX() + circle.getRadius()) < 0.5;
+                b.velY = 0;
+                b.velX = 0;
+
+                brickGenerator.play();
+                bricksMotion.play();
+                scene.setOnMouseClicked(e -> {
+                    try {
+                        handleMouseClick(e.getX(), e.getY(), line, pane);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                });
+            } if (bottomBorder && !firstBallHitTheBottom&& b.inMotion) {
+                Ball.ballsHitTheBottom ++;
+                b.velY = 0;
+                b.velX = 0;
+                b.inMotion = false;
+                ballStartLocationX = b.circle.getTranslateX();
+                ballStartLocationY = b.circle.getTranslateY();
+                firstCircle = b.circle;
+                firstBallHitTheBottom = true;
 
 
+            }
 
-                if (brickRightBorder || brickLeftBorder){
-                    velX *= -1;
-                    circle.setTranslateX(circle.getTranslateX()+velX/2);
-                    break;
-                } else {
-                    velY *= -1;
-                    circle.setTranslateY(circle.getTranslateY()+velY/2);
-                    break;
+            for (int i = 0; i < Brick.bricksList.size(); i++) {
+                Rectangle rect = Brick.bricksList.get(i).rectangle;
+                if (circle.getBoundsInParent().intersects(rect.getBoundsInParent())) {
+                    Brick brick = Brick.bricksList.get(i);
+                    brick.points -= 1;
+                    if (brick.points == 0) {
+                        Brick.bricksList.remove(brick);
+                        pane.getChildren().remove(brick.rectangle);
+                        pane.getChildren().remove(brick.label);
+                    }
+                    brick.label.setText(Integer.toString(brick.points));
+
+
+                    boolean brickLeftBorder = Math.abs(circle.getTranslateX() + circle.getRadius() - rect.getX()) < 0.5;
+                    boolean brickRightBorder = Math.abs(rect.getX() + brickWidth - circle.getTranslateX() + circle.getRadius()) < 0.5;
+
+                    if (brickRightBorder || brickLeftBorder) {
+                        b.velX *= -1;
+                        circle.setTranslateX(circle.getTranslateX() + b.velX / 2);
+                        break;
+                    } else {
+                        b.velY *= -1;
+                        circle.setTranslateY(circle.getTranslateY() + b.velY / 2);
+                        break;
+                    }
+
                 }
-
             }
         }
 
@@ -178,14 +251,16 @@ public class Game {
         LowerBorderLine.setEndY(550);
 
 
-
         pane.getChildren().add(upperBorderLine);
         pane.getChildren().add(LowerBorderLine);
 
 
-        circle = new Circle(8, Color.BLUE);
+        Circle circle = new Circle(8, Color.BLUE);
+        Ball b = new Ball(circle);
+        ballsList.add(b);
         circle.setTranslateX(scene.getWidth() / 2);
-        circle.setTranslateY(scene.getHeight() - 105);
+        circle.setTranslateY(scene.getHeight() - 107);
+        firstCircle = circle;
 
 
         line = new Line();
@@ -195,7 +270,7 @@ public class Game {
         pauseButton = new Button("pause");
         pauseButton.setTranslateX(5);
         pauseButton.setTranslateY(5);
-//        scene.setOnKeyPressed(e -> keyPress(e.getCode()));
+
         pauseButton.setOnAction(e -> handleButtonClick());
 
 
@@ -203,9 +278,14 @@ public class Game {
         pane.getChildren().add(circle);
         pane.getChildren().add(pauseButton);
 
-
         scene.setOnMouseMoved(e -> handleMouseMove(e.getX(), e.getY(), Game.pane));
-        scene.setOnMouseClicked(e -> handleMouseClick(e.getX(), e.getY()));
+        scene.setOnMouseClicked(e -> {
+            try {
+                handleMouseClick(e.getX(), e.getY(), line, pane);
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
         bricksMotion.setCycleCount(Animation.INDEFINITE);
         brickGenerator.setCycleCount(Animation.INDEFINITE);
@@ -214,8 +294,6 @@ public class Game {
         bricksMotion.play();
         brickGenerator.play();
         animation.play();
-
-
 
         primaryStage.show();
 
@@ -240,22 +318,60 @@ public class Game {
 
     public void handleMouseMove(double x, double y, Pane pane) {
         pane.getChildren().remove(line);
-        line = new Line(x, y, circle.getTranslateX(), circle.getTranslateY());
+        line = new Line(x, y, firstCircle.getTranslateX(), firstCircle.getTranslateY());
         line.setStrokeWidth(3);
         line.setFill(Color.rgb(200, 200, 200, 0.5));
         line.getStrokeDashArray().addAll(2d, 21d);
-        Game.pane.getChildren().add(line);
     }
 
-    public void handleMouseClick(double x, double y){
-        double deltaX = x - circle.getTranslateX();
-        double deltaY = y - circle.getTranslateY();
+    public void handleMouseClick(double x, double y, Line line, Pane pane) throws InterruptedException {
+
+
+
+        if (firstBallHitTheBottom){
+            Circle circle = new Circle();
+            circle.setTranslateX(ballStartLocationX);
+            circle.setTranslateY(ballStartLocationY);
+            circle.setFill(Color.BLUE);
+            circle.setRadius(8);
+            Ball ball = new Ball(circle);
+            ballsList.add(ball);
+            pane.getChildren().add(circle);
+
+        }
+        firstBallHitTheBottom = false;
+        Ball.ballsHitTheBottom = 0;
+
+
+
+        pane.getChildren().remove(line);
+        bricksMotion.stop();
+        brickGenerator.stop();
+        scene.setOnMouseClicked(null);
+
+        double deltaX = x - firstCircle.getTranslateX();
+        double deltaY = y - firstCircle.getTranslateY();
         double distance = Math.hypot(deltaX, deltaY);
 
+        Timer timer = new Timer();
+        long delay= 80;
 
-        velX = totalVel * deltaX / distance;
-        velY = totalVel * deltaY / distance;
+
+        for (int i = 0; i < ballsList.size(); i++){
+            final int index = i;
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    ballsList.get(index).inMotion = true;
+                    ballsList.get(index).velX = totalVel * deltaX / distance;
+                    ballsList.get(index).velY = totalVel * deltaY / distance;
+
+                }
+            },i*delay);
+
+        }
     }
+
 }
 
 
