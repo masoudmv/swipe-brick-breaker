@@ -9,6 +9,9 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class Main extends Application {
+
+//    MediaPlayer mediaPlayer;
+
     @Override
     public void start(Stage stage) throws IOException {
         try{

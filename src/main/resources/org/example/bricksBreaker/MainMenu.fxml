@@ -7,14 +7,14 @@
 
 <AnchorPane fx:id="scenePane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="479.0" prefWidth="319.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.bricksBreaker.SceneController">
    <children>
-      <Label layoutX="103.0" layoutY="37.0" text="Main menu">
+      <Label layoutX="98.0" layoutY="61.0" text="Main menu">
          <font>
             <Font size="24.0" />
          </font>
       </Label>
-      <Button layoutX="122.0" layoutY="142.0" mnemonicParsing="false"  text="New Game" />
-      <Button layoutX="118.0" layoutY="240.0" mnemonicParsing="false" text="History of Records" />
-      <Button layoutX="135.0" layoutY="296.0" mnemonicParsing="false" text="Setting " />
-      <Button fx:id="exit" layoutX="146.0" layoutY="339.0" mnemonicParsing="false" onAction="#exit" text="Exit" />
+      <Button layoutX="120.0" layoutY="166.0" mnemonicParsing="false" text="New Game" />
+      <Button layoutX="101.0" layoutY="240.0" mnemonicParsing="false" text="History of Records" />
+      <Button layoutX="129.0" layoutY="303.0" mnemonicParsing="false" text="Setting " />
+      <Button fx:id="exit" layoutX="141.0" layoutY="370.0" mnemonicParsing="false" onAction="#exit" text="Exit" />
    </children>
 </AnchorPane>
