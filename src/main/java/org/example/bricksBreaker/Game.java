@@ -26,17 +26,18 @@ import static org.example.bricksBreaker.Ball.power;
 import static org.example.bricksBreaker.Brick.*;
 import static org.example.bricksBreaker.RegularItem.*;
 
+
 public class Game {
     static boolean earthquakeInProgress = false;
     static boolean colorDanceInProgress = false;
     static boolean speedInProgress = false;
 
-    private final int specialItemDifficulty = 5;
+    public static int specialItemDifficulty = 5;
     int score = 0;
-    static Color ballColor = Color.BLUE;
+    static Color ballColor;
     Circle aimCircle;
 
-    public static final int createdNumberOfRectanglesInARow = 3;
+    public static int createdNumberOfRectanglesInARow = 3;
 
     double ballStartLocationX;
     double ballStartLocationY;

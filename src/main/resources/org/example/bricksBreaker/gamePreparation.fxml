@@ -8,9 +8,9 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.bricksBreaker.gamePreparationController">
    <children>
-      <Button layoutX="137.0" layoutY="538.0" mnemonicParsing="false" text="START">
+      <Button layoutX="137.0" layoutY="538.0" mnemonicParsing="false" onAction="#start" text="START">
          <font>
             <Font size="18.0" />
          </font>
@@ -30,18 +30,18 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <TextField layoutX="172.0" layoutY="170.0" />
-      <RadioButton fx:id="ease" layoutX="168.0" layoutY="279.0" mnemonicParsing="false" text="easy">
+      <TextField fx:id="textField" layoutX="172.0" layoutY="170.0" />
+      <RadioButton fx:id="ease" layoutX="168.0" layoutY="279.0" mnemonicParsing="false" onAction="#easy" text="easy">
          <toggleGroup>
             <ToggleGroup fx:id="difficulty" />
          </toggleGroup></RadioButton>
-      <RadioButton fx:id="normal" layoutX="168.0" layoutY="311.0" mnemonicParsing="false" text="normal" toggleGroup="$difficulty" />
-      <RadioButton fx:id="hard" layoutX="168.0" layoutY="342.0" mnemonicParsing="false" text="hard" toggleGroup="$difficulty" />
-      <RadioButton layoutX="195.0" layoutY="400.0" mnemonicParsing="false" text="blue">
+      <RadioButton fx:id="normal" layoutX="168.0" layoutY="311.0" mnemonicParsing="false" onAction="#normal" text="normal" toggleGroup="$difficulty" />
+      <RadioButton fx:id="hard" layoutX="168.0" layoutY="342.0" mnemonicParsing="false" onAction="#hard" text="hard" toggleGroup="$difficulty" />
+      <RadioButton fx:id="blue" layoutX="196.0" layoutY="409.0" mnemonicParsing="false" onAction="#blue" text="blue">
          <toggleGroup>
             <ToggleGroup fx:id="color" />
          </toggleGroup></RadioButton>
-      <RadioButton layoutX="195.0" layoutY="436.0" mnemonicParsing="false" text="red" toggleGroup="$color" />
-      <RadioButton layoutX="195.0" layoutY="469.0" mnemonicParsing="false" text="gold" toggleGroup="$color" />
+      <RadioButton fx:id="red" layoutX="195.0" layoutY="436.0" mnemonicParsing="false" onAction="#red" text="red" toggleGroup="$color" />
+      <RadioButton fx:id="gold" layoutX="195.0" layoutY="462.0" mnemonicParsing="false" onAction="#gold" text="gold" toggleGroup="$color" />
    </children>
 </AnchorPane>
