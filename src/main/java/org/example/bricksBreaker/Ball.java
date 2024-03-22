@@ -6,9 +6,10 @@ import javafx.scene.shape.Circle;
 import java.util.ArrayList;
 
 public class Ball {
+    public static int power = 1;
     static int numberOfBalls=0;
     boolean inMotion = false;
-//    static ArrayList<Ball> ballsList = new ArrayList<>();
+    static ArrayList<Ball> ballsList = new ArrayList<>();
     double velX;
     double velY;
     Circle circle;

@@ -21,24 +21,39 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.example.bricksBreaker.Brick.getRandomColor;
+import static org.example.bricksBreaker.Ball.ballsList;
+import static org.example.bricksBreaker.Ball.power;
+import static org.example.bricksBreaker.Brick.*;
+import static org.example.bricksBreaker.RegularItem.*;
 
 public class Game {
+    static boolean earthquakeInProgress = false;
+    static boolean colorDanceInProgress = false;
+    static boolean speedInProgress = false;
 
     private final int specialItemDifficulty = 5;
-    static ArrayList <Ball> ballsList = new ArrayList<>();
     int score = 0;
-    boolean firstBallHitTheBottom = false;
+    static Color ballColor = Color.BLUE;
+    Circle aimCircle;
+
+    public static final int createdNumberOfRectanglesInARow = 3;
+
     double ballStartLocationX;
     double ballStartLocationY;
-    boolean colorD = false;
-    boolean anim = false;
+    double aimCircleVelX;
+    double aimCircleVelY;
+
 
     private Circle firstCircle;
-    private final double totalVel = 1;
+    public static double totalVel = 1;
     private boolean isPaused;
     Line line;
     private final Button pauseButton;
+
+
+    boolean firstBallHitTheBottom = false;
+    boolean colorD = false;
+    boolean anim = false;
 
 
     Line upperBorderLine;
@@ -46,17 +61,17 @@ public class Game {
     Label spentTime;
     Label playerScore;
 
-    static Stage primaryStage;
-    static Scene scene;
-    static Pane pane;
-    public static double brickVel = 0.1;
-    private final int maxNumberOfRectanglesInARow = 6;
-    private final int brickHeight = 36;
-    private final double brickWidth = (double) 350 / maxNumberOfRectanglesInARow;
+     Stage primaryStage;
+     Scene scene;
+     Pane pane;
+//    public static double brickVel = 0.1;
+//    public final int maxNumberOfRectanglesInARow = 6;
+//    public final int brickHeight = 36;
+//    public final double brickWidth = (double) 350 / maxNumberOfRectanglesInARow;
 
     public void generatorOfBricksInARow(Scene scene, Pane pane, int row){
         Random rand = new Random();
-        int numberOfRectangles = rand.nextInt(3) + 1;
+        int numberOfRectangles = rand.nextInt(createdNumberOfRectanglesInARow) + 1;
         ArrayList <Integer> randNumbers = new ArrayList<>();
         int randomX;
         ArrayList<Brick> bricksInThisRow = new ArrayList<>();
@@ -68,12 +83,17 @@ public class Game {
                     randomX = rand.nextInt(maxNumberOfRectanglesInARow);
                 }
             } randNumbers.add(randomX);
-            double rectangleX = (int) (randomX * brickWidth);
+            double rectangleX = (int) (randomX * (double) 350 / maxNumberOfRectanglesInARow);
             b.rectangle.setX(rectangleX);
             b.rectangle.setHeight(brickHeight);
-            b.rectangle.setWidth(scene.getWidth()/maxNumberOfRectanglesInARow);
+            b.rectangle.setWidth(brickWidth);
             b.label.setLayoutX(rectangleX + b.rectangle.getWidth()/2 - 5);
-            b.color = Color.BLACK;
+            if (colorDanceInProgress){
+                b.color = getRandomColor();
+            } else {
+                b.color = Color.BLACK;
+            }
+
             b.rectangle.setStroke(Color.WHITE);
             Brick.bricksList.add(b);
             bricksInThisRow.add(b);
@@ -90,8 +110,8 @@ public class Game {
 //            TODO earthquake
         } else if (s == 1){
             int index = (int)(Math.random() * bricksInThisRow.size());
-            bricksInThisRow.get(index).rectangle.setFill(Color.GREEN);
-            bricksInThisRow.get(index).color = Color.GREEN;
+            bricksInThisRow.get(index).rectangle.setFill(Color.GRAY);
+            bricksInThisRow.get(index).color = Color.GRAY;
 
         }
 
@@ -125,10 +145,8 @@ public class Game {
 
     }
 
-    private Timeline timer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+    private final Timeline timer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
         spentTime.setText(String.valueOf(Integer.parseInt(spentTime.getText()) + 1));
-//        pauseButton.setOnAction();
-
     }));
 
     AtomicInteger ro = new AtomicInteger(1);
@@ -143,14 +161,14 @@ public class Game {
     Timeline colorDance = new Timeline(new KeyFrame(Duration.seconds(0.5), event1 -> {
         Brick.colorDance(pane);
 
-//        primaryStage.setScene(scene);
-
-
     }));
 
 
 
     Timeline animation = new Timeline(new KeyFrame(Duration.millis(4), event -> {
+
+
+//        System.out.println(earthquakeInProgress);
         //        score update:
 //        TODO design a score formula
         playerScore.setText(Integer.toString(score));
@@ -173,8 +191,40 @@ public class Game {
                 b.velX *= -1;
             }
 
+            for (RegularItem r:regularItems){
+                Circle c = r.circle;
+                if (b.circle.getBoundsInParent().intersects(c.getBoundsInParent())){
+                    if (c.getFill() == Color.GREEN){
+                        pane.getChildren().remove(c);
+                        strength();
+
+
+                    } else if (c.getFill() == Color.GOLD){
+                        pane.getChildren().remove(c);
+
+                    } else if (c.getFill() == Color.VIOLET){
+                        pane.getChildren().remove(c);
+
+                    } else if (c.getFill() == Color.PURPLE) {
+                        pane.getChildren().remove(c);
+
+                    }
+
+                }
+            }
+
+
+
+
             if (bottomBorder && Ball.numberOfBalls ==1 && b.inMotion) {
                 Brick.brickJump();
+
+//                TODO vmdkvmlkasdvnklsdsnvav
+//                pane.getChildren().add(generateRandomItem());
+
+
+
+
 //                RegularItem.createRegularItem(scene, pane);
 
                 Ball.ballsHitTheBottom ++;
@@ -183,23 +233,45 @@ public class Game {
                 b.inMotion = false;
                 brickGenerator.play();
 //                bricksMotion.play();
-                brickVel = 0.1;
+                brickVel = 0.4;
                 ballStartLocationX = b.circle.getTranslateX();
                 ballStartLocationY = b.circle.getTranslateY();
                 firstCircle = b.circle;
                 firstBallHitTheBottom = true;
                 anim = false;
-                scene.setOnMouseClicked(e -> {
-                    try {
-                        handleMouseClick(e.getX(), e.getY(), line, pane);
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
+                pane.getChildren().add(generateRandomItem());
+
+
+
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+
+                        scene.setOnMouseClicked(e -> {
+                            try {
+
+                                handleMouseClick(e.getX(), e.getY(), line, pane);
+                            } catch (InterruptedException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        });
+
                     }
-                });
+                },251);
 
 
 
-            }if (bottomBorder && firstBallHitTheBottom && Ball.ballsHitTheBottom+1 != Ball.numberOfBalls && b.inMotion) {
+
+
+
+
+
+
+
+            }
+
+            if (bottomBorder && firstBallHitTheBottom && Ball.ballsHitTheBottom+1 != Ball.numberOfBalls && b.inMotion) {
                 b.circle.setTranslateY(ballStartLocationY);
                 b.circle.setTranslateX(ballStartLocationX);
                 b.inMotion = false;
@@ -209,6 +281,8 @@ public class Game {
 
             }  if (bottomBorder && firstBallHitTheBottom && Ball.ballsHitTheBottom+1 == Ball.numberOfBalls&& b.inMotion) {
                 Brick.brickJump();
+//                TODO ascnaskcnasncacn
+
 //                RegularItem.createRegularItem(scene, pane);
                 b.circle.setTranslateY(ballStartLocationY);
                 b.circle.setTranslateX(ballStartLocationX);
@@ -219,15 +293,25 @@ public class Game {
 
                 brickGenerator.play();
 //                bricksMotion.play();
-                brickVel = 0.1;
+                brickVel = 0.4;
                 anim = false;
-                scene.setOnMouseClicked(e -> {
-                    try {
-                        handleMouseClick(e.getX(), e.getY(), line, pane);
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
+                pane.getChildren().add(generateRandomItem());
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+
+                        scene.setOnMouseClicked(e -> {
+                            try {
+
+                                handleMouseClick(e.getX(), e.getY(), line, pane);
+                            } catch (InterruptedException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        });
+
                     }
-                });
+                },251);
             } if (bottomBorder && !firstBallHitTheBottom && b.inMotion) {
                 Ball.ballsHitTheBottom ++;
                 b.velY = 0;
@@ -245,11 +329,11 @@ public class Game {
                 Rectangle rect = Brick.bricksList.get(i).rectangle;
                 if (circle.getBoundsInParent().intersects(rect.getBoundsInParent())) {
                     Brick brick = Brick.bricksList.get(i);
-                    brick.currentPoints -= 1;
-                    if (brick.currentPoints == 0) {
+                    brick.currentPoints -= power;
+                    if (brick.currentPoints <= 0) {
                         if (brick.rectangle.getFill() == Color.GREEN){
 
-                            colorDance.setCycleCount(Animation.INDEFINITE);
+                            colorDance.setCycleCount(20);
                             colorDance.play();
                             colorD = true;
                             // Reset the colors back to original after 10 seconds
@@ -263,6 +347,19 @@ public class Game {
                                 }
                             }, 10000); // 10 seconds
 
+                        }
+//                        todo TODO earthquake
+                        if (brick.rectangle.getFill() == Color.GRAY) {
+                            if (!earthquakeInProgress){
+                                earthquake();
+                            }
+
+
+
+                        }
+                        for (Brick bri: bricksList){
+                            bri.rectangle.setWidth(brickWidth);
+                            bri.rectangle.setHeight(brickHeight);
                         }
                         score += brick.points;
                         Brick.bricksList.remove(brick);
@@ -292,7 +389,9 @@ public class Game {
 
     }));
 
-    Timeline bricksMotion = new Timeline(new KeyFrame(Duration.millis(4), event -> {
+    Timeline bricksMotion = new Timeline(new KeyFrame(Duration.millis(16.63), event -> {
+//        System.out.println(brickVel);
+//        System.out.println(brickHeight + "  "+ brickWidth);
 
         pane.getChildren().remove(line);
         pane.getChildren().add(line);
@@ -305,10 +404,11 @@ public class Game {
             b.label.setLayoutY(b.rectangle.getY() + brickVel + 8);
 
             if (b.rectangle.getHeight() + b.rectangle.getY() >= scene.getHeight()-100){
+//                TODO game over screen
                 brickVel = 0;
                 brickGenerator.stop();
                 animation.stop();
-                timer.stop();
+//                timer.stop();
 
             }
         }
@@ -322,29 +422,12 @@ public class Game {
         scene = new Scene(pane, 350, 650);
         primaryStage.setScene(scene);
 
-        upperBorderLine = new Line();
-        LowerBorderLine = new Line();
+        upperBorderLine = new Line(0, 100,scene.getWidth(), 100);
+        LowerBorderLine = new Line(0, 550, scene.getWidth(), 550);
 
 
 
-
-        upperBorderLine.setStartX(0);
-        upperBorderLine.setStartY(100);
-        upperBorderLine.setEndX(scene.getWidth());
-        upperBorderLine.setEndY(100);
-
-
-        LowerBorderLine.setStartX(0);
-        LowerBorderLine.setStartY(550);
-        LowerBorderLine.setEndX(scene.getWidth());
-        LowerBorderLine.setEndY(550);
-
-
-        pane.getChildren().add(upperBorderLine);
-        pane.getChildren().add(LowerBorderLine);
-
-
-        Circle circle = new Circle(8, Color.BLUE);
+        Circle circle = new Circle(8, ballColor);
         Ball b = new Ball(circle);
         ballsList.add(b);
         circle.setTranslateX(scene.getWidth() / 2);
@@ -359,17 +442,68 @@ public class Game {
         pauseButton = new Button("pause");
         pauseButton.setTranslateX(5);
         pauseButton.setTranslateY(5);
+        pauseButton.setOnAction(e -> {
+            try {
+                handleButtonClick();
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
-        pauseButton.setOnAction(e -> handleButtonClick());
 
 
-        pane.setBackground(Background.fill(Color.WHITE));
-        pane.getChildren().add(line);
-        pane.getChildren().add(circle);
-        pane.getChildren().add(pauseButton);
-//        pane.getChildren().add(spentTime);
 
-        scene.setOnMouseMoved(e -> handleMouseMove(e.getX(), e.getY(), Game.pane));
+        Label scr = new Label("score:");
+        scr.setLayoutX(239);
+        scr.setLayoutY(568);
+        scr.setScaleX(2);
+        scr.setScaleY(2);
+        scr.setTextFill(Color.RED);
+        pane.getChildren().add(scr);
+
+        playerScore = new Label("0");
+        playerScore.setLayoutX(300);
+        playerScore.setLayoutY(570);
+        playerScore.setScaleX(2);
+        playerScore.setScaleY(2);
+        playerScore.setTextFill(Color.RED);
+
+
+
+        Label clock = new Label("Time:");
+        clock.setLayoutX(40);
+        clock.setLayoutY(568);
+        clock.setScaleX(2);
+        clock.setScaleY(2);
+        clock.setTextFill(Color.RED);
+        pane.getChildren().add(clock);
+
+
+        spentTime = new Label();
+        spentTime.setText("0");
+        spentTime.setLayoutX(100);
+        spentTime.setLayoutY(570);
+        spentTime.setTextFill(Color.RED);
+        spentTime.setScaleX(2);
+        spentTime.setScaleY(2);
+        pane.getChildren().add(spentTime);
+
+
+//        smallify.setCycleCount(Animation.INDEFINITE);
+
+
+        bricksMotion.setCycleCount(Animation.INDEFINITE);
+        brickGenerator.setCycleCount(Animation.INDEFINITE);
+        animation.setCycleCount(Animation.INDEFINITE);
+        timer.setCycleCount(Animation.INDEFINITE);
+
+        bricksMotion.play();
+        brickGenerator.play();
+        timer.play();
+        animation.play();
+
+
+        scene.setOnMouseMoved(e -> handleMouseMove(e.getX(), e.getY(), pane));
         scene.setOnMouseClicked(e -> {
             try {
                 handleMouseClick(e.getX(), e.getY(), line, pane);
@@ -378,93 +512,27 @@ public class Game {
             }
         });
 
-        bricksMotion.setCycleCount(Animation.INDEFINITE);
-        brickGenerator.setCycleCount(Animation.INDEFINITE);
-        animation.setCycleCount(Animation.INDEFINITE);
-        timer.setCycleCount(Animation.INDEFINITE);
 
-
-
-//        Timer t = new Timer();
-//        Stopwatch stopwatch = new Stopwatch();
-
-
-        playerScore = new Label();
-        playerScore.setText("0");
-
-        playerScore.setLayoutX(200);
-        playerScore.setLayoutY(570);
-        playerScore.setTextFill(Color.RED);
+        pane.setBackground(Background.fill(Color.WHITE));
+        pane.getChildren().add(line);
+        pane.getChildren().add(circle);
+        pane.getChildren().add(pauseButton);
+        pane.getChildren().add(upperBorderLine);
+        pane.getChildren().add(LowerBorderLine);
         pane.getChildren().add(playerScore);
-
-//        stopwatch.start();
-        spentTime = new Label();
-
-        spentTime.setText("0");
-        spentTime.setLayoutX(100);
-        spentTime.setLayoutY(570);
-        spentTime.setTextFill(Color.RED);
-        pane.getChildren().add(spentTime);
-//        t.schedule(new TimerTask() {
-//            @Override
-//            public void run() {
-//                label.setText(Float.toString(stopwatch.getElapsedTimeSeconds()));
-//
-//
-//            }
-//        },1000);
-
-//        new Thread(new Runnable()
-//        {
-//            @Override
-//            public void run()
-//            {
-//
-//                while (true){
-//                    try {
-//                        Thread.sleep(1000);
-//                    } catch (InterruptedException e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                    label.setText(Float.toString(stopwatch.getElapsedTimeSeconds()));
-//                }
-//
-//
-//
-////
-//            }
-//        }).start();
-
-
-
-
-
-
-
-//        label = ;
-        bricksMotion.play();
-        brickGenerator.play();
-        timer.play();
-        animation.play();
 
 
         primaryStage.show();
-
-
-
-//        System.out.println("Time elapsed in seconds: " + stopwatch.getElapsedTimeSeconds());
-
     }
 
 
-    public void handleButtonClick() {
+    public void handleButtonClick() throws InterruptedException {
         if (isPaused) {
-//            animation.play();
             bricksMotion.play();
-
             timer.play();
             animation.play();
             pauseButton.setText("pause");
+//            speedItem.notify();
             if (colorD){
                 colorDance.play();
             } if (!anim){
@@ -477,22 +545,42 @@ public class Game {
             brickGenerator.pause();
             bricksMotion.pause();
             colorDance.pause();
-//            TODO pause timer???
             timer.pause();
             animation.pause();
+//            speedItem.wait();
             isPaused = true;
         }
     }
 
 
+
+
     public void handleMouseMove(double x, double y, Pane pane) {
         pane.getChildren().remove(line);
-        line = new Line(x, y, firstCircle.getTranslateX(), firstCircle.getTranslateY());
-        line.setStrokeWidth(3);
-        line.setFill(Color.rgb(200, 200, 200, 0.5));
-        line.getStrokeDashArray().addAll(2d, 21d);
+
+//        Circle aimCircle = new Circle(firstCircle.getTranslateX(), firstCircle.getTranslateY(), 8);
+//        double deltaX = x - firstCircle.getTranslateX();
+//        double deltaY = y - firstCircle.getTranslateY();
+//        double distance = Math.hypot(deltaX, deltaY);
+//
+//        double aimCircleVelX = totalVel * deltaX / distance;
+//        double aimCircleVelY = totalVel * deltaY / distance;
+
+
+        if (!anim){
+
+            line = new Line(x, y, firstCircle.getTranslateX(), firstCircle.getTranslateY());
+            line.setStrokeWidth(3);
+            line.setFill(Color.rgb(200, 200, 200, 0.5));
+            line.getStrokeDashArray().addAll(2d, 21d);
 
 //        TODO fix aiming ...
+
+        }
+
+
+
+
 
 //        for (Brick b : Brick.bricksList){
 //            if (b.rectangle.getBoundsInParent().intersects(line.getBoundsInParent())){
@@ -504,17 +592,33 @@ public class Game {
 
     }
 
+//    Timeline aim = new Timeline(new KeyFrame(Duration.millis(4), event -> {
+//        aimCircle.setTranslateX(aimCircle.getTranslateX() + aimCircleVelX);
+//        aimCircle.setTranslateY(aimCircle.getTranslateY() + aimCircleVelY);
+//        boolean rightBorder = aimCircle.getTranslateX() >= scene.getWidth() - aimCircle.getRadius() - 0.1;
+//        boolean leftBorder = aimCircle.getTranslateX() <= aimCircle.getRadius() + 0.1;
+//        boolean topBorder = aimCircle.getTranslateY() <= 100 + aimCircle.getRadius() + 0.1;
+//        boolean bottomBorder = aimCircle.getTranslateY() - 1 >= scene.getHeight() - 100 - aimCircle.getRadius() - 0.1;
+//
+//        if (topBorder) {
+//            System.out.println("top border");
+//
+//        }
+//        if (rightBorder || leftBorder) {
+//            System.out.println("lr border");
+//        }
+//
+//    }));
+
     public void handleMouseClick(double x, double y, Line line, Pane pane) throws InterruptedException {
+        line.setVisible(false);
 
         anim = true;
-
-
-
         if (firstBallHitTheBottom){
             Circle circle = new Circle();
             circle.setTranslateX(ballStartLocationX);
             circle.setTranslateY(ballStartLocationY);
-            circle.setFill(Color.BLUE);
+            circle.setFill(ballColor);
             circle.setRadius(8);
             Ball ball = new Ball(circle);
             ballsList.add(ball);
@@ -526,9 +630,9 @@ public class Game {
 
 
 
-        pane.getChildren().remove(line);
+
 //        bricksMotion.stop();
-        brickVel =0;
+        brickVel = 0;
         brickGenerator.stop();
         scene.setOnMouseClicked(null);
 
@@ -537,7 +641,7 @@ public class Game {
         double distance = Math.hypot(deltaX, deltaY);
 
         Timer timer = new Timer();
-        long delay= 80;
+        long delay= 100;
 
 
         for (int i = 0; i < ballsList.size(); i++){
@@ -549,6 +653,10 @@ public class Game {
                     ballsList.get(index).velX = totalVel * deltaX / distance;
                     ballsList.get(index).velY = totalVel * deltaY / distance;
 
+                    ballsList.get(index).circle.setTranslateX(ballsList.get(index).circle.getTranslateX()+ballsList.get(index).velX);
+                    ballsList.get(index).circle.setTranslateY(ballsList.get(index).circle.getTranslateY()+ballsList.get(index).velY);
+
+
                 }
             },i*delay);
 
@@ -558,6 +666,10 @@ public class Game {
 
 
 }
+
+
+
+
 
 
 

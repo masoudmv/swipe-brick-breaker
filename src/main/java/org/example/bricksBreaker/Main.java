@@ -5,22 +5,31 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.scene.media.AudioClip;
 
 import java.io.IOException;
 
 public class Main extends Application {
+    static AudioClip sound;
 
-//    MediaPlayer mediaPlayer;
 
     @Override
     public void start(Stage stage) throws IOException {
         try{
-//            Parent root = FXMLLoader.load(getClass().getResource("MainMenu.fxml"));
-//            Scene scene = new Scene(root);
-//            stage.setScene(scene);
-//            stage.show();
 
-            new Game();
+
+
+            sound = new AudioClip(getClass().getResource("soundtrack.mp3").toExternalForm());
+            sound.play();
+
+
+
+            Parent root = FXMLLoader.load(getClass().getResource("Mainmenu.fxml"));
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+
+//            new Game();
         } catch (Exception e){
             e.printStackTrace();
         }

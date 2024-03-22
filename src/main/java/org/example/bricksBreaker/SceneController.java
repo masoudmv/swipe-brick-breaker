@@ -5,12 +5,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-
-import java.io.IOException;
 
 public class SceneController {
 
@@ -24,13 +21,19 @@ public class SceneController {
 //        new GamePlay();
 //    }
 
-//    public void switchToScene1(ActionEvent event) throws IOException {
-//        root = FXMLLoader.load(getClass().getResource("scene2.fxml"));
+//    public void switchToSetting(ActionEvent event) throws IOException {
+//        root = FXMLLoader.load(getClass().getResource("setting.fxml"));
 //        stage = (Stage)((Node) event.getSource()).getScene().getWindow();
 //        scene = new Scene(root);
 //        stage.setScene(scene);
 //        stage.show();
+//
+//    }
 
+//    public void setting(ActionEvent event){
+//        stage = (Stage) scenePane.getScene().getWindow();
+//        stage.close();
+//
 //    }
 
 
