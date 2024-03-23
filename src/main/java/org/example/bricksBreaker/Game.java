@@ -37,7 +37,6 @@ import static org.example.bricksBreaker.gameOverController.yourScore;
 
 
 public class Game {
-    boolean isGameOver = false;
     static boolean earthquakeInProgress = false;
     static boolean colorDanceInProgress = false;
     static boolean speedInProgress = false;
@@ -45,15 +44,13 @@ public class Game {
     public static int specialItemDifficulty = 5;
     static int score = 0;
     static Color ballColor = Color.BLUE;
-//    Circle aimCircle;
-//    boolean gameOver = false;
+    boolean addNewBall = false;
 
     public static int createdNumberOfRectanglesInARow = 3;
 
     static double  ballStartLocationX;
     static double ballStartLocationY;
-    double aimCircleVelX;
-    double aimCircleVelY;
+    static boolean dizzinessInProgress = false;
 
 
     private Circle firstCircle;
@@ -66,8 +63,6 @@ public class Game {
     boolean firstBallHitTheBottom = false;
     boolean colorD = false;
     boolean anim = false;
-
-
     Line upperBorderLine;
     Line LowerBorderLine;
     Label spentTime;
@@ -80,18 +75,16 @@ public class Game {
 
     void gameOver() throws IOException {
 
-
-
-
-
         earthquakeInProgress = false;
         colorDanceInProgress = false;
         speedInProgress = false;
+        dizzinessInProgress = false;
+        addNewBall = false;
+
         colorD = false;
         anim = false;
         firstBallHitTheBottom = false;
         Ball.numberOfBalls = 0;
-//        numberOfBalls = 0;
 
         primaryStage = (Stage) pane.getScene().getWindow();
         primaryStage.close();
@@ -137,10 +130,7 @@ public class Game {
                 e.printStackTrace();
             }
         }
-
-
         stage.show();
-
     }
 
     public void generatorOfBricksInARow(Scene scene, Pane pane, int row){
@@ -175,48 +165,17 @@ public class Game {
             pane.getChildren().add(b.label);
 
         } int s = rand.nextInt(specialItemDifficulty);
-//        TODO color dance
         if (s == 0){
             int index = (int)(Math.random() * bricksInThisRow.size());
             bricksInThisRow.get(index).rectangle.setFill(Color.GREEN);
             bricksInThisRow.get(index).color = Color.GREEN;
 
-//            TODO earthquake
         } else if (s == 1){
             int index = (int)(Math.random() * bricksInThisRow.size());
             bricksInThisRow.get(index).rectangle.setFill(Color.GRAY);
             bricksInThisRow.get(index).color = Color.GRAY;
 
         }
-
-
-
-
-
-//        int color;
-//        for (int i = 0; i < maxNumberOfRectanglesInARow; i++) {
-//            if (!randNumbers.contains(i)){
-//                RegularItem item = new RegularItem();
-//                item.circle = new Circle();
-//                color = rand.nextInt(4);
-//                if (color == 0){
-//                    item.circle.setFill(Color.GREEN);
-//                } else if (color ==1){
-//                    item.circle.setFill(Color.BLUE);
-//                } else if (color ==2){
-//                    item.circle.setFill(Color.VIOLET);
-//                } else {
-//                    item.circle.setFill(Color.YELLOW);
-//                }
-//
-//                item.circle.setCenterX(i * brickWidth + brickWidth/2);
-//                item.circle.setCenterY(100 + (double) brickHeight / 2);
-//                item.circle.setRadius(8);
-//                RegularItem.regularItems.add(item);
-//
-//            }
-//        }
-
     }
 
     private final Timeline timer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
@@ -231,7 +190,6 @@ public class Game {
     }));
 
 
-//    TODO color dance timeline
     Timeline colorDance = new Timeline(new KeyFrame(Duration.seconds(0.5), event1 -> {
         colorDance(pane);
 
@@ -242,8 +200,6 @@ public class Game {
     Timeline animation = new Timeline(new KeyFrame(Duration.millis(4), event -> {
 
 
-//        System.out.println(earthquakeInProgress);
-        //        score update:
 //        TODO design a score formula
         playerScore.setText(Integer.toString(score));
 
@@ -268,19 +224,28 @@ public class Game {
             for (RegularItem r:regularItems){
                 Circle c = r.circle;
                 if (b.circle.getBoundsInParent().intersects(c.getBoundsInParent())){
+//                        strength
                     if (c.getFill() == Color.GREEN){
+                        c.setFill(Color.WHITE);
                         pane.getChildren().remove(c);
                         strength();
-
-
-                    } else if (c.getFill() == Color.GOLD){
+//                        speed
+                    } if (c.getFill() == Color.GOLD){
                         pane.getChildren().remove(c);
-
-                    } else if (c.getFill() == Color.VIOLET){
+                        c.setFill(Color.WHITE);
+                        if (!speedInProgress){
+                            speed();
+                        }
+//                        add ball
+                    } if (c.getFill() == Color.VIOLET){
+                        c.setFill(Color.WHITE);
                         pane.getChildren().remove(c);
-
-                    } else if (c.getFill() == Color.PURPLE) {
+                        addNewBall = true;
+//                      dizziness
+                    } if (c.getFill() == Color.PURPLE) {
+                        c.setFill(Color.WHITE);
                         pane.getChildren().remove(c);
+                        dizzinessInProgress = true;
 
                     }
 
@@ -293,31 +258,24 @@ public class Game {
             if (bottomBorder && Ball.numberOfBalls ==1 && b.inMotion) {
                 brickJump();
 
-//                TODO vmdkvmlkasdvnklsdsnvav
-//                pane.getChildren().add(generateRandomItem());
-
-
                 anim = false;
                 line.setVisible(true);
 
 
-
-
-//                RegularItem.createRegularItem(scene, pane);
 
                 Ball.ballsHitTheBottom ++;
                 b.velY = 0;
                 b.velX = 0;
                 b.inMotion = false;
                 brickGenerator.play();
-//                System.out.println("yuhooooo");
-//                bricksMotion.play();
+
                 brickVel = 0.4;
                 ballStartLocationX = b.circle.getTranslateX();
                 ballStartLocationY = b.circle.getTranslateY();
                 firstCircle = b.circle;
                 firstBallHitTheBottom = true;
                 anim = false;
+
                 pane.getChildren().add(generateRandomItem());
 
 
@@ -351,9 +309,7 @@ public class Game {
 
             }  if (bottomBorder && firstBallHitTheBottom && Ball.ballsHitTheBottom+1 == Ball.numberOfBalls&& b.inMotion) {
                 brickJump();
-//                TODO ascnaskcnasncacn
 
-//                RegularItem.createRegularItem(scene, pane);
                 b.circle.setTranslateY(ballStartLocationY);
                 b.circle.setTranslateX(ballStartLocationX);
                 b.inMotion = false;
@@ -397,13 +353,52 @@ public class Game {
             }
 
             for (int i = 0; i < bricksList.size(); i++) {
-                Rectangle rect = bricksList.get(i).rectangle;
-                if (circle.getBoundsInParent().intersects(rect.getBoundsInParent())) {
-                    Brick brick = bricksList.get(i);
-                    brick.currentPoints -= power;
-                    if (brick.currentPoints <= 0) {
-                        if (brick.rectangle.getFill() == Color.GREEN){
+                Brick brick = bricksList.get(i);
+                Rectangle rect = brick.rectangle;
 
+                // Check for collision
+                if (circle.getBoundsInParent().intersects(rect.getBoundsInParent())) {
+                    // Calculate distance between ball center and rectangle center
+                    double dx = circle.getTranslateX() - rect.getX() - rect.getWidth() / 2;
+                    double dy = circle.getTranslateY() - rect.getY() - rect.getHeight() / 2;
+
+                    // Calculate the maximum distance between ball center and rectangle edges
+                    double maxXDist = rect.getWidth() / 2 + circle.getRadius();
+                    double maxYDist = rect.getHeight() / 2 + circle.getRadius();
+
+                    // If the distance is within the maximum allowed distance, handle collision
+                    if (Math.abs(dx) < maxXDist && Math.abs(dy) < maxYDist) {
+                        // Determine collision side
+                        double offsetX = maxXDist - Math.abs(dx);
+                        double offsetY = maxYDist - Math.abs(dy);
+
+                        if (offsetX < offsetY) {
+                            // Horizontal collision
+                            b.velX *= -1;
+                            if (dx > 0) {
+                                // Ball is on the right side of the rectangle
+                                circle.setTranslateX(rect.getX() + rect.getWidth() + circle.getRadius());
+                            } else {
+                                // Ball is on the left side of the rectangle
+                                circle.setTranslateX(rect.getX() - circle.getRadius());
+                            }
+                        } else {
+                            // Vertical collision
+                            b.velY *= -1;
+                            if (dy > 0) {
+                                // Ball is below the rectangle
+                                circle.setTranslateY(rect.getY() + rect.getHeight() + circle.getRadius());
+                            } else {
+                                // Ball is above the rectangle
+                                circle.setTranslateY(rect.getY() - circle.getRadius());
+                            }
+                        }
+
+                        // Update brick points if its health points reach zero
+                        brick.currentPoints -= power;
+                        if (brick.currentPoints <= 0) {
+                            if (brick.rectangle.getFill() == Color.GREEN){
+//
                             colorDance.setCycleCount(20);
                             colorDance.play();
                             colorD = true;
@@ -418,86 +413,24 @@ public class Game {
                                 }
                             }, 10000); // 10 seconds
 
-                        }
-//                        todo TODO earthquake
-                        if (brick.rectangle.getFill() == Color.GRAY) {
+                        } if (brick.rectangle.getFill() == Color.GRAY) {
                             if (!earthquakeInProgress){
                                 earthquake();
                             }
-
-
-
                         }
-                        for (Brick bri: bricksList){
-                            bri.rectangle.setWidth(brickWidth);
-                            bri.rectangle.setHeight(brickHeight);
+                            score += brick.points;
+                            bricksList.remove(brick);
+                            pane.getChildren().remove(brick.rectangle);
+                            pane.getChildren().remove(brick.label);
                         }
-                        score += brick.points;
-                        bricksList.remove(brick);
-                        pane.getChildren().remove(brick.rectangle);
-                        pane.getChildren().remove(brick.label);
-
+                        brick.label.setText(Integer.toString(brick.currentPoints));
                     }
-                    brick.label.setText(Integer.toString(brick.currentPoints));
-
-
-                    boolean brickLeftBorder = Math.abs(circle.getTranslateX() + circle.getRadius() - rect.getX()) < 0.5;
-                    boolean brickRightBorder = Math.abs(rect.getX() + brickWidth - circle.getTranslateX() + circle.getRadius()) < 0.5;
-
-                    if (brickRightBorder || brickLeftBorder) {
-                        b.velX *= -1;
-                        circle.setTranslateX(circle.getTranslateX() + b.velX / 2);
-                        break;
-                    } else {
-                        b.velY *= -1;
-                        circle.setTranslateY(circle.getTranslateY() + b.velY / 2);
-                        break;
-                    }
-
                 }
             }
+
         }
 
     }));
-
-
-//    final Timeline[] bricksMotion = {new Timeline(new KeyFrame(Duration.millis(16.63), event -> {
-        // Check your condition here
-//        if (conditionMet) {
-//            timelineRef[0].stop(); // Stop the timeline if condition is met
-//            showGameOverScreen();
-//        }
-
-//    Timeline bricksMotion = new Timeline(new KeyFrame(Duration.millis(16.63), event -> {
-//
-//        for (RegularItem i : regularItems){
-//            i.circle.setCenterY(i.circle.getCenterY()+brickVel);
-//        }
-//        for (Brick b : bricksList){
-//            b.rectangle.setY(b.rectangle.getY() + brickVel);
-//            b.label.setLayoutY(b.rectangle.getY() + brickVel + 8);
-//
-//            if (b.rectangle.getHeight() + b.rectangle.getY() >= scene.getHeight()-100){
-////                TODO game over screen
-//                brickVel = 0;
-//                brickGenerator.stop();
-//                animation.stop();
-//                bricksMotion.stop();
-////                timelineRef[0].stop(); // Stop the timeline if condition is met
-//                isGameOver = true;
-//                try {
-//                    gameOver();
-//                } catch (IOException e) {
-//                    throw new RuntimeException(e);
-//                }
-//
-//
-//            }
-//        }
-//
-//    }));
-
-
 
     Timeline bricksMotion = new Timeline();
     KeyFrame keyFrame = new KeyFrame(Duration.millis(16.63), event -> {
@@ -509,8 +442,7 @@ public class Game {
             b.label.setLayoutY(b.rectangle.getY() + brickVel + 8);
 
             if (b.rectangle.getHeight() + b.rectangle.getY() >= scene.getHeight() - 100){
-                // TODO game over screen
-//                brickVel = 0;
+
                 brickGenerator.stop();
                 animation.stop();
                 bricksMotion.stop();
@@ -521,7 +453,6 @@ public class Game {
                 bricksList.clear();
                 regularItems.clear();
 
-//                isGameOver = true;
                 try {
                     gameOver();
                 } catch (IOException e) {
@@ -533,20 +464,12 @@ public class Game {
 
 
     public Game(Event event) throws InterruptedException, IOException {
-//        primaryStage = new Stage();
-//        pane = new Pane();
-//        scene = new Scene(pane, 350, 650);
-//        primaryStage.setScene(scene);
-
-
-
 
         pane = new Pane();
 
         primaryStage = (Stage)((Node) event.getSource()).getScene().getWindow();
         scene = new Scene(pane, 350, 650);
         primaryStage.setScene(scene);
-//        primaryStage.show();
 
 
         scene.setOnMouseMoved(e -> handleMouseMove(e.getX(), e.getY(), pane));
@@ -618,7 +541,6 @@ public class Game {
         pane.getChildren().add(spentTime);
 
 
-//        smallify.setCycleCount(Animation.INDEFINITE);
 
 
         bricksMotion.setCycleCount(Animation.INDEFINITE);
@@ -629,8 +551,6 @@ public class Game {
 
 
         bricksMotion.getKeyFrames().add(keyFrame);
-//        bricksMotion.setCycleCount(Timeline.INDEFINITE);
-//        bricksMotion.play();
 
 
         bricksMotion.play();
@@ -693,7 +613,6 @@ public class Game {
             colorDance.pause();
             timer.pause();
             animation.pause();
-//            speedItem.wait();
             line.setVisible(false);
             isPaused = true;
         }
@@ -706,6 +625,11 @@ public class Game {
 
             mouseX = x;
             mouseY = y;
+            if (dizzinessInProgress){
+                Random random = new Random();
+                mouseX = random.nextDouble(5, 345);
+                mouseY = 450;
+            }
             startX = firstCircle.getTranslateX();
             startY = firstCircle.getTranslateY();
 
@@ -730,8 +654,8 @@ public class Game {
 
 
     public void handleMouseClick(double x, double y, Line line, Pane pane) throws InterruptedException {
-//        TODO
         line.setVisible(false);
+
 
         anim = true;
         if (firstBallHitTheBottom){
@@ -743,21 +667,38 @@ public class Game {
             Ball ball = new Ball(circle);
             ballsList.add(ball);
             pane.getChildren().add(circle);
+            if (addNewBall){
+                Circle c = new Circle();
+                c.setTranslateX(ballStartLocationX);
+                c.setTranslateY(ballStartLocationY);
+                c.setFill(ballColor);
+                c.setRadius(8);
+                Ball b = new Ball(c);
+                ballsList.add(b);
+                pane.getChildren().add(c);
+                addNewBall = false;
+            }
 
         }
         firstBallHitTheBottom = false;
         Ball.ballsHitTheBottom = 0;
 
-
-
-
-//        bricksMotion.stop();
         brickVel = 0;
         brickGenerator.stop();
         scene.setOnMouseClicked(null);
 
-        double deltaX = x - firstCircle.getTranslateX();
-        double deltaY = y - firstCircle.getTranslateY();
+
+
+        double deltaX;
+        double deltaY;
+        if(dizzinessInProgress){
+            deltaX = mouseX - firstCircle.getTranslateX();
+            deltaY = mouseY - firstCircle.getTranslateY();
+            dizzinessInProgress = false;
+        } else {
+            deltaX = x - firstCircle.getTranslateX();
+            deltaY = y - firstCircle.getTranslateY();
+        }
         double distance = Math.hypot(deltaX, deltaY);
 
         Timer timer = new Timer();

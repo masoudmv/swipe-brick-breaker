@@ -1,7 +1,5 @@
 package org.example.bricksBreaker;
 
-import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -14,9 +12,7 @@ import java.util.TimerTask;
 import static org.example.bricksBreaker.Ball.ballsList;
 import static org.example.bricksBreaker.Ball.power;
 import static org.example.bricksBreaker.Brick.bricksList;
-import static org.example.bricksBreaker.Brick.getRandomColor;
-import static org.example.bricksBreaker.Game.speedInProgress;
-import static org.example.bricksBreaker.Game.totalVel;
+import static org.example.bricksBreaker.Game.*;
 
 
 public class RegularItem {
@@ -24,7 +20,6 @@ public class RegularItem {
 
     Circle circle;
     Color color;
-    static ArrayList <Circle> visibleItems = new ArrayList<>();
     static ArrayList<RegularItem> regularItems = new ArrayList<>();
 
     RegularItem(Circle circle){
@@ -32,43 +27,40 @@ public class RegularItem {
     }
     void addBall(){
         Circle circle = new Circle();
-//        circle.setTranslateX(ballStartLocationX);
-//        circle.setTranslateY(ballStartLocationY);
-        circle.setFill(Color.BLUE);
+        circle.setFill(ballColor);
         circle.setRadius(8);
         Ball ball = new Ball(circle);
-//        ballsList.add(ball);
-//        pane.getChildren().add(circle);
-    }
-    public static void speed(){
-//        System.out.println("speed is running");
-//        Game.speedInProgress = true;
 
+    }
+    public static void speed() {
         totalVel *= 2;
-        for (Ball ball : ballsList){
-            ball.velX =2*ball.velX;
-            ball.velY =2 * ball.velY;
+        for (Ball ball : ballsList) {
+            ball.velX *= 2;
+            ball.velY *= 2;
         }
-        speedItem = new Timer();
-        speedItem.schedule(new TimerTask() {
+        speedInProgress = true; // Set the flag to indicate speed item is active
+
+        Timer speedItemTimer = new Timer();
+        speedItemTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                for (Ball ball : ballsList){
-                    ball.velX =ball.velX/2;
-                    ball.velY = ball.velY/2;
+                // Restore original velocities only if the speed item is still active
+                if (speedInProgress) {
+//                    for (Ball ball : ballsList) {
+//                        ball.velX /= 2;
+//                        ball.velY /= 2;
+//                    }
+                    totalVel = 1;
+                    speedInProgress = false; // Reset the flag after the duration
                 }
-                totalVel = 1;
-                speedInProgress = false;
+                speedItemTimer.cancel(); // Cancel the timer after executing once
             }
-        }, 15000); // 10 seconds
-
+        }, 15000); // 15 seconds
     }
+
+
     static void strength(){
-//        System.out.println("speed is running");
-//        Game.speedInProgress = true;
-
         power = 2;
-
         speedItem = new Timer();
         speedItem.schedule(new TimerTask() {
             @Override
@@ -76,57 +68,8 @@ public class RegularItem {
                 power = 1;
             }
         }, 15000); // 10 seconds
-
-
     }
     void dizziness(){
-
-    }
-    static void showRegularItem(Pane pane){
-        Random random = new Random();
-        int rand = random.nextInt(regularItems.size());
-        Circle circle = regularItems.get(rand).circle;
-        while (circle.getTranslateY() > 325){
-            rand = random.nextInt(regularItems.size());
-            circle = regularItems.get(rand).circle;
-        } pane.getChildren().add(circle);
-        visibleItems.add(circle);
-    }
-
-    static void createRegularItem(Scene scene, Pane pane){
-        Random random = new Random();
-        double x = random.nextDouble(scene.getWidth());
-        double y = random.nextDouble(10, scene.getHeight()/2);
-        Circle circle = new Circle(x, y, 10);
-        boolean tryAgain = false;
-
-        while (true){
-            for (Brick brick: bricksList){
-                if (brick.rectangle.getBoundsInParent().intersects(circle.getBoundsInParent())){
-                    tryAgain = true;
-                }
-            } for (Circle c : visibleItems){
-                c.setRadius(10);
-                if (c.getBoundsInParent().intersects(circle.getBoundsInParent())){
-                    tryAgain = true;
-                }
-                c.setRadius(8);
-            } if (!tryAgain){
-                circle.setRadius(8);
-                visibleItems.add(circle);
-                pane.getChildren().add(circle);
-                return;
-
-            }
-            x = random.nextDouble(scene.getWidth());
-            y = random.nextDouble(10, scene.getHeight()/2);
-
-            circle.setTranslateX(x);
-            circle.setTranslateY(y);
-
-        }
-
-
 
     }
 
@@ -146,19 +89,20 @@ public class RegularItem {
         } while (checkIntersection(item));
 
         RegularItem regularItem = new RegularItem(item);
+//        TODO violet generator ...
 
         regularItems.add(regularItem);
         int color = random.nextInt(4);
         if (color == 0){
-            regularItem.circle.setFill(Color.GREEN);
+            regularItem.circle.setFill(Color.PURPLE);
         } else if (color == 1){
-            regularItem.circle.setFill(Color.GREEN);
+            regularItem.circle.setFill(Color.PURPLE);
         } else if (color == 2){
-            regularItem.circle.setFill(Color.GREEN);
+            regularItem.circle.setFill(Color.PURPLE);
         } else if (color == 3) {
-            regularItem.circle.setFill(Color.GREEN);
+            regularItem.circle.setFill(Color.PURPLE);
         }
-//        TODO add bonus itemssssssssssssssssssssssssssssssssssss +=================+++++++++++++++++++
+//        TODO add bonus items
 
 
         return item;

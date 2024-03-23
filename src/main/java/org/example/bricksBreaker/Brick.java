@@ -138,17 +138,12 @@ public class Brick {
 
 
     static Timeline smallify = new Timeline(new KeyFrame(Duration.millis(16.63), event -> {
-//        System.out.println("bhsbhdbshd");
         reduce();
-//        System.out.println(brickHeight);
-//        System.out.println(brickWidth);
 
     }));
 
     static Timeline biggify = new Timeline(new KeyFrame(Duration.millis(16.63), event -> {
         magnify();
-//        System.out.println(brickHeight);
-//        System.out.println(brickWidth);
 
     }));
 
@@ -163,11 +158,8 @@ public class Brick {
             b.label.setLayoutX(b.label.getLayoutX()+0.05);
             b.label.setLayoutY(b.label.getLayoutY()-0.05);
 
-//            b.label.setScaleX(b.label.getScaleX()-0.001);
-//            b.label.setScaleY(b.label.getScaleY()-0.001);
 
         }
-//        System.out.println(brickHeight);
     }
     public static void magnify(){
         brickHeight += 0.2;
@@ -180,15 +172,11 @@ public class Brick {
             b.label.setLayoutX(b.label.getLayoutX()-0.05);
             b.label.setLayoutY(b.label.getLayoutY()+0.05);
 
-//            b.label.setScaleX(b.label.getScaleX()+0.001);
-//            b.label.setScaleY(b.label.getScaleY()+0.001);
         }
-//        System.out.println(brickHeight);
     }
     public static void earthquake(){
-//        System.out.println("sfsf");
         earthquakeInProgress = true;
-//        System.out.println("========================");
+
 
 
         Timer timer = new Timer();
@@ -199,30 +187,19 @@ public class Brick {
             @Override
             public void run() {
                 if (shrink) {
-//                    biggify.stop();
+
                     smallify.setCycleCount(60);
                     smallify.play();
-//                    System.out.println("small");
-//                    for(Brick b:bricksList) {
-//                        b.rectangle.setWidth( brickWidth /2);
-//                        b.rectangle.setHeight( brickHeight /2);
-//                    }
+
                 } else {
-//                    for(Brick b:bricksList) {
-//                        b.rectangle.setWidth(brickWidth );
-//                        b.rectangle.setHeight(brickHeight);
-//                    }
-//                    smallify.stop();
 
                     biggify.setCycleCount(60);
                     biggify.play();
-//                    System.out.println("magnify");
                 }
 
                 shrink = !shrink;
             }
         }, 0, 1000);
-        // Schedule a task to cancel the Timer after DURATION
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -233,7 +210,7 @@ public class Brick {
                 t.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        System.out.println("default");
+//                        System.out.println("default");
                         brickWidth = (double) 350 / maxNumberOfRectanglesInARow;
                         brickHeight = 36;
                         earthquakeInProgress = false;
