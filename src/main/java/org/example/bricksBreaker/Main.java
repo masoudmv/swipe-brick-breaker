@@ -4,15 +4,16 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 import javafx.scene.media.AudioClip;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 
 public class Main extends Application {
     static AudioClip sound;
-    static Color ballColor;
+
+    static boolean showAim;
+    static boolean saveRecords;
 
 
     @Override
@@ -21,8 +22,9 @@ public class Main extends Application {
 
 
 
+
             sound = new AudioClip(getClass().getResource("soundtrack.mp3").toExternalForm());
-            sound.play();
+//            sound.play();
 
 
 

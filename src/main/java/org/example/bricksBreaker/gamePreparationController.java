@@ -63,6 +63,7 @@ public class gamePreparationController {
 
     @FXML
     void start(ActionEvent event) throws InterruptedException {
+        Player p = new Player(textField.getText());
         new Game();
 
     }

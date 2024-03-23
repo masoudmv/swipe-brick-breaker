@@ -21,10 +21,18 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.example.bricksBreaker.Aim.intersectionX;
+import static org.example.bricksBreaker.Aim.intersectionY;
 import static org.example.bricksBreaker.Ball.ballsList;
 import static org.example.bricksBreaker.Ball.power;
 import static org.example.bricksBreaker.Brick.*;
+import static org.example.bricksBreaker.Main.showAim;
 import static org.example.bricksBreaker.RegularItem.*;
+import static org.example.bricksBreaker.Aim.mouseX;
+import static org.example.bricksBreaker.Aim.mouseY;
+import static org.example.bricksBreaker.Aim.startX;
+import static org.example.bricksBreaker.Aim.startY;
+
 
 
 public class Game {
@@ -34,13 +42,13 @@ public class Game {
 
     public static int specialItemDifficulty = 5;
     int score = 0;
-    static Color ballColor;
+    static Color ballColor = Color.BLUE;
     Circle aimCircle;
 
     public static int createdNumberOfRectanglesInARow = 3;
 
-    double ballStartLocationX;
-    double ballStartLocationY;
+    static double  ballStartLocationX;
+    static double ballStartLocationY;
     double aimCircleVelX;
     double aimCircleVelY;
 
@@ -48,7 +56,7 @@ public class Game {
     private Circle firstCircle;
     public static double totalVel = 1;
     private boolean isPaused;
-    Line line;
+    static Line line;
     private final Button pauseButton;
 
 
@@ -224,6 +232,10 @@ public class Game {
 //                pane.getChildren().add(generateRandomItem());
 
 
+                anim = false;
+                line.setVisible(true);
+
+
 
 
 //                RegularItem.createRegularItem(scene, pane);
@@ -293,6 +305,7 @@ public class Game {
                 b.velX = 0;
 
                 brickGenerator.play();
+                line.setVisible(true);
 //                bricksMotion.play();
                 brickVel = 0.4;
                 anim = false;
@@ -394,8 +407,12 @@ public class Game {
 //        System.out.println(brickVel);
 //        System.out.println(brickHeight + "  "+ brickWidth);
 
-        pane.getChildren().remove(line);
-        pane.getChildren().add(line);
+
+
+//        TODO
+
+//        pane.getChildren().remove(line);
+//        pane.getChildren().add(line);
 
         for (RegularItem i : RegularItem.regularItems){
             i.circle.setCenterY(i.circle.getCenterY()+brickVel);
@@ -409,7 +426,11 @@ public class Game {
                 brickVel = 0;
                 brickGenerator.stop();
                 animation.stop();
-//                timer.stop();
+                Label label = new Label("GAME OVER");
+                label.setLayoutX(150);
+                label.setLayoutY(50);
+
+
 
             }
         }
@@ -422,6 +443,9 @@ public class Game {
         pane = new Pane();
         scene = new Scene(pane, 350, 650);
         primaryStage.setScene(scene);
+
+
+        scene.setOnMouseMoved(e -> handleMouseMove(e.getX(), e.getY(), pane));
 
         upperBorderLine = new Line(0, 100,scene.getWidth(), 100);
         LowerBorderLine = new Line(0, 550, scene.getWidth(), 550);
@@ -504,7 +528,7 @@ public class Game {
         animation.play();
 
 
-        scene.setOnMouseMoved(e -> handleMouseMove(e.getX(), e.getY(), pane));
+
         scene.setOnMouseClicked(e -> {
             try {
                 handleMouseClick(e.getX(), e.getY(), line, pane);
@@ -514,8 +538,13 @@ public class Game {
         });
 
 
+        if (showAim){
+            pane.getChildren().add(line);
+        }
+
+
         pane.setBackground(Background.fill(Color.WHITE));
-        pane.getChildren().add(line);
+
         pane.getChildren().add(circle);
         pane.getChildren().add(pauseButton);
         pane.getChildren().add(upperBorderLine);
@@ -534,6 +563,7 @@ public class Game {
             animation.play();
             pauseButton.setText("pause");
 //            speedItem.notify();
+            line.setVisible(true);
             if (colorD){
                 colorDance.play();
             } if (!anim){
@@ -549,6 +579,7 @@ public class Game {
             timer.pause();
             animation.pause();
 //            speedItem.wait();
+            line.setVisible(false);
             isPaused = true;
         }
     }
@@ -557,61 +588,34 @@ public class Game {
 
 
     public void handleMouseMove(double x, double y, Pane pane) {
-        pane.getChildren().remove(line);
 
-//        Circle aimCircle = new Circle(firstCircle.getTranslateX(), firstCircle.getTranslateY(), 8);
-//        double deltaX = x - firstCircle.getTranslateX();
-//        double deltaY = y - firstCircle.getTranslateY();
-//        double distance = Math.hypot(deltaX, deltaY);
-//
-//        double aimCircleVelX = totalVel * deltaX / distance;
-//        double aimCircleVelY = totalVel * deltaY / distance;
+            mouseX = x;
+            mouseY = y;
+            startX = firstCircle.getTranslateX();
+            startY = firstCircle.getTranslateY();
 
-
-        if (!anim){
-
-            line = new Line(x, y, firstCircle.getTranslateX(), firstCircle.getTranslateY());
             line.setStrokeWidth(3);
             line.setFill(Color.rgb(200, 200, 200, 0.5));
             line.getStrokeDashArray().addAll(2d, 21d);
+            new Aim();
+
+            line.setStartX(firstCircle.getTranslateX());
+            line.setStartY(firstCircle.getTranslateY());
+            line.setEndX(intersectionX);
+            line.setEndY(intersectionY);
+
+
 
 //        TODO fix aiming ...
 
-        }
 
-
-
-
-
-//        for (Brick b : Brick.bricksList){
-//            if (b.rectangle.getBoundsInParent().intersects(line.getBoundsInParent())){
-//                line.setStartX(b.rectangle.getX());
-//                line.setStartY(b.rectangle.getY());
-//
-//            }
-//        }
 
     }
 
-//    Timeline aim = new Timeline(new KeyFrame(Duration.millis(4), event -> {
-//        aimCircle.setTranslateX(aimCircle.getTranslateX() + aimCircleVelX);
-//        aimCircle.setTranslateY(aimCircle.getTranslateY() + aimCircleVelY);
-//        boolean rightBorder = aimCircle.getTranslateX() >= scene.getWidth() - aimCircle.getRadius() - 0.1;
-//        boolean leftBorder = aimCircle.getTranslateX() <= aimCircle.getRadius() + 0.1;
-//        boolean topBorder = aimCircle.getTranslateY() <= 100 + aimCircle.getRadius() + 0.1;
-//        boolean bottomBorder = aimCircle.getTranslateY() - 1 >= scene.getHeight() - 100 - aimCircle.getRadius() - 0.1;
-//
-//        if (topBorder) {
-//            System.out.println("top border");
-//
-//        }
-//        if (rightBorder || leftBorder) {
-//            System.out.println("lr border");
-//        }
-//
-//    }));
+
 
     public void handleMouseClick(double x, double y, Line line, Pane pane) throws InterruptedException {
+//        TODO
         line.setVisible(false);
 
         anim = true;

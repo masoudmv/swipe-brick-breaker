@@ -55,7 +55,7 @@ public class Brick {
             @Override
             public void run()
             {
-                brickVel = 2.4;
+                brickVel *= 6;
 
                 try {
                     Thread.sleep(250);
@@ -63,7 +63,7 @@ public class Brick {
                     throw new RuntimeException(e);
                 }
 
-                brickVel = 0.4;
+                brickVel /= 6;
             }
         }).start();
     }

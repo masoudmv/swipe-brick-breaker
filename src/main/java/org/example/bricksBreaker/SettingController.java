@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+import static org.example.bricksBreaker.Main.showAim;
 import static org.example.bricksBreaker.Main.sound;
 
 
@@ -46,16 +47,14 @@ public class SettingController {
         stage.show();
 
     }
+    @FXML
+    void AimOff(ActionEvent event){
+        showAim = false;
 
+    }
+    @FXML
+    void AimOn(ActionEvent event){
+        showAim = true;
 
-//    @FXML
-//    void close(ActionEvent event) throws IOException {
-//        Parent root = FXMLLoader.load(getClass().getResource("scene2.fxml"));
-//        Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
-//        Scene scene = new Scene(root);
-//        stage.setScene(scene);
-//        stage.show();
-//
-//
-//    }
+    }
 }
