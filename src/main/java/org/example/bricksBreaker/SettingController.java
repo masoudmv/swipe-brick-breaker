@@ -11,8 +11,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-import static org.example.bricksBreaker.Main.showAim;
-import static org.example.bricksBreaker.Main.sound;
+import static org.example.bricksBreaker.Main.*;
 
 
 public class SettingController {
@@ -55,6 +54,18 @@ public class SettingController {
     @FXML
     void AimOn(ActionEvent event){
         showAim = true;
+
+    }
+
+    @FXML
+    void saveOn(ActionEvent event){
+        saveRecords = true;
+
+    }
+
+    @FXML
+    void saveOff(ActionEvent event){
+        saveRecords = false;
 
     }
 }

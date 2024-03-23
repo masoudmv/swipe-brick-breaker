@@ -1,8 +1,13 @@
 package org.example.bricksBreaker;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.event.Event;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -15,35 +20,33 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.example.bricksBreaker.Aim.intersectionX;
-import static org.example.bricksBreaker.Aim.intersectionY;
+import static org.example.bricksBreaker.Aim.*;
 import static org.example.bricksBreaker.Ball.ballsList;
 import static org.example.bricksBreaker.Ball.power;
 import static org.example.bricksBreaker.Brick.*;
+import static org.example.bricksBreaker.Main.saveRecords;
 import static org.example.bricksBreaker.Main.showAim;
 import static org.example.bricksBreaker.RegularItem.*;
-import static org.example.bricksBreaker.Aim.mouseX;
-import static org.example.bricksBreaker.Aim.mouseY;
-import static org.example.bricksBreaker.Aim.startX;
-import static org.example.bricksBreaker.Aim.startY;
-
+import static org.example.bricksBreaker.gameOverController.yourScore;
 
 
 public class Game {
+    boolean isGameOver = false;
     static boolean earthquakeInProgress = false;
     static boolean colorDanceInProgress = false;
     static boolean speedInProgress = false;
 
     public static int specialItemDifficulty = 5;
-    int score = 0;
+    static int score = 0;
     static Color ballColor = Color.BLUE;
-    Circle aimCircle;
+//    Circle aimCircle;
+//    boolean gameOver = false;
 
     public static int createdNumberOfRectanglesInARow = 3;
 
@@ -73,10 +76,72 @@ public class Game {
      Stage primaryStage;
      Scene scene;
      Pane pane;
-//    public static double brickVel = 0.1;
-//    public final int maxNumberOfRectanglesInARow = 6;
-//    public final int brickHeight = 36;
-//    public final double brickWidth = (double) 350 / maxNumberOfRectanglesInARow;
+
+
+    void gameOver() throws IOException {
+
+
+
+
+
+        earthquakeInProgress = false;
+        colorDanceInProgress = false;
+        speedInProgress = false;
+        colorD = false;
+        anim = false;
+        firstBallHitTheBottom = false;
+        Ball.numberOfBalls = 0;
+//        numberOfBalls = 0;
+
+        primaryStage = (Stage) pane.getScene().getWindow();
+        primaryStage.close();
+
+
+        Stage stage = new Stage();
+
+
+        Pane root = FXMLLoader.load(getClass().getResource("gameOverScreen.fxml"));
+        yourScore.setText(Integer.toString(score));
+        yourScore.setVisible(true);
+//        System.out.println(yourScore.getText());
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        yourScore.setLayoutX(200);
+        yourScore.setLayoutY(233);
+        yourScore.setScaleX(1.5);
+        yourScore.setScaleY(1.5);
+        yourScore.setTextFill(new Color(0.1026, 0.27, 0.1054, 1.0));
+        root.getChildren().add(yourScore);
+
+
+        if (saveRecords) {
+            Calendar calendar = Calendar.getInstance();
+            Date currentDate = calendar.getTime();
+            List<Player> players = new ArrayList<>();
+            players.add(new Player(Main.name, score, currentDate));
+            try (FileReader reader = new FileReader("saves.json")) {
+                Gson gson = new Gson();
+                Player[] playersArray = gson.fromJson(reader, Player[].class);
+                if (playersArray != null) {
+                    for (Player player : playersArray) {
+                        players.add(player);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try (FileWriter writer = new FileWriter("saves.json")) {
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                gson.toJson(players, writer);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        stage.show();
+
+    }
 
     public void generatorOfBricksInARow(Scene scene, Pane pane, int row){
         Random rand = new Random();
@@ -104,7 +169,7 @@ public class Game {
             }
 
             b.rectangle.setStroke(Color.WHITE);
-            Brick.bricksList.add(b);
+            bricksList.add(b);
             bricksInThisRow.add(b);
             pane.getChildren().add(b.rectangle);
             pane.getChildren().add(b.label);
@@ -168,7 +233,7 @@ public class Game {
 
 //    TODO color dance timeline
     Timeline colorDance = new Timeline(new KeyFrame(Duration.seconds(0.5), event1 -> {
-        Brick.colorDance(pane);
+        colorDance(pane);
 
     }));
 
@@ -226,7 +291,7 @@ public class Game {
 
 
             if (bottomBorder && Ball.numberOfBalls ==1 && b.inMotion) {
-                Brick.brickJump();
+                brickJump();
 
 //                TODO vmdkvmlkasdvnklsdsnvav
 //                pane.getChildren().add(generateRandomItem());
@@ -245,6 +310,7 @@ public class Game {
                 b.velX = 0;
                 b.inMotion = false;
                 brickGenerator.play();
+//                System.out.println("yuhooooo");
 //                bricksMotion.play();
                 brickVel = 0.4;
                 ballStartLocationX = b.circle.getTranslateX();
@@ -273,15 +339,6 @@ public class Game {
                     }
                 },251);
 
-
-
-
-
-
-
-
-
-
             }
 
             if (bottomBorder && firstBallHitTheBottom && Ball.ballsHitTheBottom+1 != Ball.numberOfBalls && b.inMotion) {
@@ -293,7 +350,7 @@ public class Game {
                 b.velX = 0;
 
             }  if (bottomBorder && firstBallHitTheBottom && Ball.ballsHitTheBottom+1 == Ball.numberOfBalls&& b.inMotion) {
-                Brick.brickJump();
+                brickJump();
 //                TODO ascnaskcnasncacn
 
 //                RegularItem.createRegularItem(scene, pane);
@@ -339,10 +396,10 @@ public class Game {
 
             }
 
-            for (int i = 0; i < Brick.bricksList.size(); i++) {
-                Rectangle rect = Brick.bricksList.get(i).rectangle;
+            for (int i = 0; i < bricksList.size(); i++) {
+                Rectangle rect = bricksList.get(i).rectangle;
                 if (circle.getBoundsInParent().intersects(rect.getBoundsInParent())) {
-                    Brick brick = Brick.bricksList.get(i);
+                    Brick brick = bricksList.get(i);
                     brick.currentPoints -= power;
                     if (brick.currentPoints <= 0) {
                         if (brick.rectangle.getFill() == Color.GREEN){
@@ -355,7 +412,7 @@ public class Game {
                             resetTimer.schedule(new TimerTask() {
                                 @Override
                                 public void run() {
-                                    Brick.resetColors(pane);
+                                    resetColors(pane);
                                     colorDance.stop();
                                     colorD = false;
                                 }
@@ -376,7 +433,7 @@ public class Game {
                             bri.rectangle.setHeight(brickHeight);
                         }
                         score += brick.points;
-                        Brick.bricksList.remove(brick);
+                        bricksList.remove(brick);
                         pane.getChildren().remove(brick.rectangle);
                         pane.getChildren().remove(brick.label);
 
@@ -403,46 +460,93 @@ public class Game {
 
     }));
 
-    Timeline bricksMotion = new Timeline(new KeyFrame(Duration.millis(16.63), event -> {
-//        System.out.println(brickVel);
-//        System.out.println(brickHeight + "  "+ brickWidth);
+
+//    final Timeline[] bricksMotion = {new Timeline(new KeyFrame(Duration.millis(16.63), event -> {
+        // Check your condition here
+//        if (conditionMet) {
+//            timelineRef[0].stop(); // Stop the timeline if condition is met
+//            showGameOverScreen();
+//        }
+
+//    Timeline bricksMotion = new Timeline(new KeyFrame(Duration.millis(16.63), event -> {
+//
+//        for (RegularItem i : regularItems){
+//            i.circle.setCenterY(i.circle.getCenterY()+brickVel);
+//        }
+//        for (Brick b : bricksList){
+//            b.rectangle.setY(b.rectangle.getY() + brickVel);
+//            b.label.setLayoutY(b.rectangle.getY() + brickVel + 8);
+//
+//            if (b.rectangle.getHeight() + b.rectangle.getY() >= scene.getHeight()-100){
+////                TODO game over screen
+//                brickVel = 0;
+//                brickGenerator.stop();
+//                animation.stop();
+//                bricksMotion.stop();
+////                timelineRef[0].stop(); // Stop the timeline if condition is met
+//                isGameOver = true;
+//                try {
+//                    gameOver();
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
+//
+//
+//            }
+//        }
+//
+//    }));
 
 
 
-//        TODO
-
-//        pane.getChildren().remove(line);
-//        pane.getChildren().add(line);
-
-        for (RegularItem i : RegularItem.regularItems){
-            i.circle.setCenterY(i.circle.getCenterY()+brickVel);
+    Timeline bricksMotion = new Timeline();
+    KeyFrame keyFrame = new KeyFrame(Duration.millis(16.63), event -> {
+        for (RegularItem i : regularItems){
+            i.circle.setCenterY(i.circle.getCenterY() + brickVel);
         }
-        for (Brick b : Brick.bricksList){
+        for (Brick b : bricksList){
             b.rectangle.setY(b.rectangle.getY() + brickVel);
             b.label.setLayoutY(b.rectangle.getY() + brickVel + 8);
 
-            if (b.rectangle.getHeight() + b.rectangle.getY() >= scene.getHeight()-100){
-//                TODO game over screen
-                brickVel = 0;
+            if (b.rectangle.getHeight() + b.rectangle.getY() >= scene.getHeight() - 100){
+                // TODO game over screen
+//                brickVel = 0;
                 brickGenerator.stop();
                 animation.stop();
-                Label label = new Label("GAME OVER");
-                label.setLayoutX(150);
-                label.setLayoutY(50);
+                bricksMotion.stop();
+                timer.stop();
 
+                colorDance.stop();
+                ballsList.clear();
+                bricksList.clear();
+                regularItems.clear();
 
-
+//                isGameOver = true;
+                try {
+                    gameOver();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
+    });
 
-    }));
+
+    public Game(Event event) throws InterruptedException, IOException {
+//        primaryStage = new Stage();
+//        pane = new Pane();
+//        scene = new Scene(pane, 350, 650);
+//        primaryStage.setScene(scene);
 
 
-    public Game() throws InterruptedException {
-        primaryStage = new Stage();
+
+
         pane = new Pane();
+
+        primaryStage = (Stage)((Node) event.getSource()).getScene().getWindow();
         scene = new Scene(pane, 350, 650);
         primaryStage.setScene(scene);
+//        primaryStage.show();
 
 
         scene.setOnMouseMoved(e -> handleMouseMove(e.getX(), e.getY(), pane));
@@ -522,6 +626,13 @@ public class Game {
         animation.setCycleCount(Animation.INDEFINITE);
         timer.setCycleCount(Animation.INDEFINITE);
 
+
+
+        bricksMotion.getKeyFrames().add(keyFrame);
+//        bricksMotion.setCycleCount(Timeline.INDEFINITE);
+//        bricksMotion.play();
+
+
         bricksMotion.play();
         brickGenerator.play();
         timer.play();
@@ -552,7 +663,11 @@ public class Game {
         pane.getChildren().add(playerScore);
 
 
+
+
+
         primaryStage.show();
+
     }
 
 
@@ -667,6 +782,8 @@ public class Game {
 
         }
     }
+
+
 
 
 

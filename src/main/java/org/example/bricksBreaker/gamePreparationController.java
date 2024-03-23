@@ -6,6 +6,8 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 
+import java.io.IOException;
+
 import static org.example.bricksBreaker.Brick.brickVel;
 import static org.example.bricksBreaker.Game.*;
 
@@ -56,15 +58,10 @@ public class gamePreparationController {
         ballColor = Color.GOLD;
 
     }
-
-
-
-
-
     @FXML
-    void start(ActionEvent event) throws InterruptedException {
-        Player p = new Player(textField.getText());
-        new Game();
+    void start(ActionEvent event) throws InterruptedException, IOException {
+        Main.name = textField.getText();
+        new Game(event);
 
     }
 }

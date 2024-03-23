@@ -31,8 +31,8 @@
       <Button layoutX="270.0" layoutY="240.0" mnemonicParsing="false" onAction="#soundOff" text="OFF" />
       <Button layoutX="200.0" layoutY="339.0" mnemonicParsing="false" onAction="#AimOn" text="ON" />
       <Button layoutX="270.0" layoutY="339.0" mnemonicParsing="false" onAction="#AimOff" text="OFF" />
-      <Button layoutX="200.0" layoutY="438.0" mnemonicParsing="false" text="ON" />
-      <Button layoutX="270.0" layoutY="438.0" mnemonicParsing="false" onAction="#soundOn" text="OFF" />
+      <Button layoutX="200.0" layoutY="438.0" mnemonicParsing="false" onAction="#saveOn" text="ON" />
+      <Button layoutX="270.0" layoutY="438.0" mnemonicParsing="false" onAction="#saveOff" text="OFF" />
       <Button layoutX="123.0" layoutY="539.0" mnemonicParsing="false" onAction="#switchToMainMenu" text="CLOSE">
          <font>
             <Font size="24.0" />

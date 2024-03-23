@@ -6,9 +6,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+
+import static org.example.bricksBreaker.Game.score;
 
 public class gameOverController {
 
@@ -17,9 +20,17 @@ public class gameOverController {
     private Scene scene;
 
     @FXML
-    void playAgain(){
+    void playAgain(ActionEvent event) throws IOException, InterruptedException {
+        new Game(event);
 
     }
+
+    @FXML
+    static Label yourScore = new Label();
+    public static void init() {
+        yourScore.setText(Integer.toString(score));
+    }
+
 
     @FXML
     void gamePreparation(ActionEvent event) throws IOException {
@@ -40,4 +51,5 @@ public class gameOverController {
         stage.setScene(scene);
         stage.show();
     }
+
 }

@@ -7,18 +7,31 @@ import javafx.scene.Scene;
 import javafx.scene.media.AudioClip;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
+//import org.json.JSONArray;
+//import org.json.JSONObject;
 
 public class Main extends Application {
+//    static Player currentPlayer;
     static AudioClip sound;
 
     static boolean showAim;
     static boolean saveRecords;
+    static String name;
 
 
     @Override
     public void start(Stage stage) throws IOException {
         try{
+
+            showAim = true;
+            saveRecords = true;
+
+//            JSONArray array = new JSONArray();
+
+
+            File saves = new File("saves.json");
 
 
 

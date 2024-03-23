@@ -16,7 +16,7 @@
          <font>
             <Font size="18.0" />
          </font></Button>
-      <Button layoutX="75.0" layoutY="306.0" mnemonicParsing="false" prefHeight="64.0" prefWidth="197.0" text="History of Records">
+      <Button layoutX="75.0" layoutY="306.0" mnemonicParsing="false" onAction="#gamesHistory" prefHeight="64.0" prefWidth="197.0" text="History of Records">
          <font>
             <Font size="18.0" />
          </font></Button>
