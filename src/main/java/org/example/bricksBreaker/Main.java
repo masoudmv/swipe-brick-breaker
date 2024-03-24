@@ -58,18 +58,6 @@ public class Main extends Application {
 
     }
 
-//    public class SceneController {
-//        @FXML
-//        private Label rec;
-//
-//        // Method to update the label text
-//        public void updateLabelText(String text) {
-//            rec.setText(text);
-//        }
-//
-//        // Other methods in your controller...
-//    }
-
 
 
     @Override

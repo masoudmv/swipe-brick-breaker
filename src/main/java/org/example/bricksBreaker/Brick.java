@@ -71,13 +71,12 @@ public class Brick {
 
 
 
-//    TODO add color dance methode
 
     // Method to change the color of all balls and bricks to a random color
     public static void colorDance(Pane pane) {
-        earthquakeInProgress = true;
+//        earthquakeInProgress = true;
         Color color = getRandomColor();
-        pane.setBackground(Background.fill(color));
+            pane.setBackground(Background.fill(color));
 
         for (Ball ball : ballsList) {
             Random random = new Random();
@@ -103,7 +102,6 @@ public class Brick {
             }
 
         }
-//         TODO color dance items
     }
 
 
@@ -134,7 +132,6 @@ public class Brick {
             brick.label.setVisible(true);
         }
 
-//        TODO revert color dance items
     }
 
 

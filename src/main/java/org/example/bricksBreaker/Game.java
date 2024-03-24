@@ -42,8 +42,10 @@ public class Game {
     static boolean earthquakeInProgress = false;
     static boolean colorDanceInProgress = false;
     static boolean speedInProgress = false;
+    public static int s;
 
     public static int specialItemDifficulty = 5;
+    static int colorDanceRemainingCycles = 20;
     static int score = 0;
     static Color ballColor = Color.BLUE;
     boolean addNewBall = false;
@@ -77,6 +79,15 @@ public class Game {
 
 
     void gameOver() throws IOException {
+        ballsList.clear();
+//        bricksList.clear();
+        regularItems.clear();
+//        for(Brick b : bricksList){
+//            pane.getChildren().remove(b.rectangle);
+//        }
+        for (Ball ball: ballsList){
+            pane.getChildren().remove(ball.circle);
+        }
 
         earthquakeInProgress = false;
         colorDanceInProgress = false;
@@ -91,24 +102,31 @@ public class Game {
         anim = false;
         firstBallHitTheBottom = false;
         Ball.numberOfBalls = 0;
-        ballsList.clear();
-        bricksList.clear();
-        regularItems.clear();
+
+        animation.stop();
+        bricksMotion.stop();
+        brickGenerator.stop();
+//        primaryStage = new Stage();
 
 
-        primaryStage = (Stage) pane.getScene().getWindow();
-        primaryStage.close();
+
+//        primaryStage = (Stage) pane.getScene().getWindow();
+//        primaryStage.close();
 
 
-        Stage stage = new Stage();
+//        Stage stage = new Stage();
+//        score = score-Integer.parseInt(spentTime.getText())/10;
+//        if (score<0){
+//            score = 0;
+//        }
 
 
         Pane root = FXMLLoader.load(getClass().getResource("gameOverScreen.fxml"));
-        yourScore.setText(Integer.toString(score));
+        yourScore.setText(String.valueOf(s));
         yourScore.setVisible(true);
 //        System.out.println(yourScore.getText());
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
+        scene = new Scene(root);
+        primaryStage.setScene(scene);
         yourScore.setLayoutX(200);
         yourScore.setLayoutY(233);
         yourScore.setScaleX(1.5);
@@ -120,29 +138,34 @@ public class Game {
         if (saveRecords) {
             Calendar calendar = Calendar.getInstance();
             Date currentDate = calendar.getTime();
+
             List<Player> players = new ArrayList<>();
-            players.add(new Player(Main.name, score, currentDate));
+//            players.clear();
+
             try (FileReader reader = new FileReader("saves.json")) {
                 Gson gson = new Gson();
                 Player[] playersArray = gson.fromJson(reader, Player[].class);
                 if (playersArray != null) {
-                    for (Player player : playersArray) {
-                        players.add(player);
-                    }
+                    players.addAll(Arrays.asList(playersArray));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            try (FileWriter writer = new FileWriter("saves.json")) {
+//            if (!players.contains(new Player(Main.name, s, currentDate))){
+                players.add(new Player(Main.name, s, currentDate));
+//            }
+            try (FileWriter writer = new FileWriter("saves.json", false)) {
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 gson.toJson(players, writer);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } if (score < maxRecord){
-            maxRecord = score;
         }
-        stage.show();
+//        if (score < maxRecord){
+//            maxRecord = score;
+//        }
+        score =0;
+        primaryStage.show();
     }
 
     public void generatorOfBricksInARow(Scene scene, Pane pane, int row){
@@ -164,11 +187,11 @@ public class Game {
             b.rectangle.setHeight(brickHeight);
             b.rectangle.setWidth(brickWidth);
             b.label.setLayoutX(rectangleX + b.rectangle.getWidth()/2 - 5);
-            if (colorDanceInProgress){
-                b.color = getRandomColor();
+            if (colorD){
+                b.rectangle.setFill(getRandomColor());
             } else {
-                b.color = Color.BLACK;
-            }
+                b.rectangle.setFill(Color.BLACK);
+            } b.color = Color.BLACK;
 
             b.rectangle.setStroke(Color.WHITE);
             bricksList.add(b);
@@ -206,17 +229,26 @@ public class Game {
 
 
     Timeline colorDance = new Timeline(new KeyFrame(Duration.seconds(0.5), event1 -> {
+        colorDanceRemainingCycles --;
         colorDance(pane);
+        if (colorDanceRemainingCycles ==0){
+            resetColors(pane);
+            colorD = false;
+        }
 
     }));
 
 
 
     Timeline animation = new Timeline(new KeyFrame(Duration.millis(4), event -> {
+        s = score- Integer.parseInt(spentTime.getText())/10;
+        if (s<0){
+            s = 0;
+        }
 
 
-//        TODO design a score formula
-        playerScore.setText(Integer.toString(score));
+
+        playerScore.setText(Integer.toString(s));
 
         for (Ball b : ballsList) {
 
@@ -295,7 +327,6 @@ public class Game {
 //                pane.getChildren().add(generateRandomItem());
 
 
-                //                ToDO run these two lines with a 500 milliseconds delay
 //                generatorOfBricksInARow(scene, pane, ro.get());
 //                ro.getAndIncrement();
 
@@ -322,7 +353,10 @@ public class Game {
                 t.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        brickGenerator.play();
+                        if(!isPaused){
+                            brickGenerator.play();
+                        }
+
                     }
                 },251);
 
@@ -370,7 +404,6 @@ public class Game {
                 anim = false;
 //                pane.getChildren().add(generateRandomItem());
 
-//                ToDO run these two lines with a 500 milliseconds delay
 //                generatorOfBricksInARow(scene, pane, ro.get());
 //                ro.getAndIncrement();
                 Platform.runLater(() -> {
@@ -395,7 +428,10 @@ public class Game {
                 t.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        brickGenerator.play();
+
+                        if(!isPaused){
+                            brickGenerator.play();
+                        }
                     }
                 },251);
 
@@ -477,20 +513,23 @@ public class Game {
                         brick.currentPoints -= power;
                         if (brick.currentPoints <= 0) {
                             if (brick.rectangle.getFill() == Color.GREEN){
+                            colorDanceRemainingCycles = 20;
 //
-                            colorDance.setCycleCount(20);
+                            colorDance.setCycleCount(colorDanceRemainingCycles);
                             colorDance.play();
                             colorD = true;
+
                             // Reset the colors back to original after 10 seconds
-                            Timer resetTimer = new Timer();
-                            resetTimer.schedule(new TimerTask() {
-                                @Override
-                                public void run() {
-                                    resetColors(pane);
-                                    colorDance.stop();
-                                    colorD = false;
-                                }
-                            }, 10000); // 10 seconds
+//                            Timer resetTimer = new Timer();
+//                            resetTimer.schedule(new TimerTask() {
+//                                @Override
+//                                public void run() {
+//                                    resetColors(pane);
+//                                    pane.setBackground(Background.fill(Color.WHITE));
+//                                    colorDance.stop();
+//                                    colorD = false;
+//                                }
+//                            }, 10000); // 10 seconds
 
                         } if (brick.rectangle.getFill() == Color.GRAY) {
                             if (!earthquakeInProgress){
@@ -516,6 +555,10 @@ public class Game {
 //        System.out.println(brickVel);
         for (RegularItem i : regularItems){
             i.circle.setCenterY(i.circle.getCenterY() + brickVel);
+            if (i.circle.getCenterY() > 540){
+                i.circle.setFill(Color.WHITE);
+                pane.getChildren().remove(i.circle);
+            }
         }
         for (Brick b : bricksList){
             b.rectangle.setY(b.rectangle.getY() + brickVel);
@@ -523,14 +566,16 @@ public class Game {
 
             if (b.rectangle.getHeight() + b.rectangle.getY() >= scene.getHeight() - 100){
 
+
+
                 brickGenerator.stop();
                 animation.stop();
-                bricksMotion.stop();
+//                bricksMotion.stop();
                 timer.stop();
 
                 colorDance.stop();
                 ballsList.clear();
-                bricksList.clear();
+//                bricksList.clear();
                 regularItems.clear();
 
                 try {
@@ -544,6 +589,19 @@ public class Game {
 
 
     public Game(Event event) throws InterruptedException, IOException {
+
+        bricksMotion.stop();
+        brickVel = defaultBrickVel;
+
+        ballsList.clear();
+        bricksList.clear();
+        regularItems.clear();
+//        System.out.println(bricksList);
+//        System.out.println(regularItems);
+//        System.out.println(ballsList);
+
+//        System.out.println(score);
+
         newBallGenerator = 0;
 
         pane = new Pane();
@@ -680,9 +738,7 @@ public class Game {
             pauseButton.setText("pause");
             resumeStrength();
             resumeSpeed();
-            colorDance.play();
-//            resumeSpeed();
-//            speedItem.notify();
+
             line.setVisible(true);
             if (colorD){
                 colorDance.play();
@@ -695,10 +751,12 @@ public class Game {
             pauseButton.setText("play");
             brickGenerator.pause();
             bricksMotion.pause();
-            colorDance.pause();
             timer.pause();
             animation.pause();
-            colorDance.pause();
+            if(colorD){
+                colorDance.pause();
+            }
+
             pauseSpeed();
             pauseStrength();
             line.setVisible(false);
@@ -733,7 +791,6 @@ public class Game {
 
 
 
-//        TODO fix aiming ...
 
 
 

@@ -187,7 +187,6 @@ public class RegularItem {
         } while (checkIntersection(item));
 
         RegularItem regularItem = new RegularItem(item);
-//        TODO violet generator ...
 
         regularItems.add(regularItem);
         if (newBallGenerator % newBallDifficulty == 0){

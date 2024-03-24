@@ -28,9 +28,9 @@ public class gameOverController {
 
     @FXML
     static Label yourScore = new Label();
-    public static void init() {
-        yourScore.setText(Integer.toString(score));
-    }
+//    public static void init() {
+//        yourScore.setText(Integer.toString(score));
+//    }
 
 
     @FXML
