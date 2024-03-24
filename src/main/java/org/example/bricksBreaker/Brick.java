@@ -63,6 +63,7 @@ public class Brick {
                     throw new RuntimeException(e);
                 }
 
+
                 brickVel /= 6;
             }
         }).start();

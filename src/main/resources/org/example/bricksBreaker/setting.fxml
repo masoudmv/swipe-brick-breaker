@@ -7,35 +7,50 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.bricksBreaker.SettingController">
    <children>
+      <!-- Setting Label -->
+      <Label layoutX="73.0" layoutY="56.0" text="SETTINGS" textFill="#ffcc00">
+         <font>
+            <Font name="Arial Black" size="36.0" />
+         </font>
+      </Label>
+
+      <!-- Sound Label -->
       <Label layoutX="40.0" layoutY="230.0" text="SOUND:">
          <font>
-            <Font size="36.0" />
+            <Font size="24.0" />
          </font>
       </Label>
-      <Label layoutX="39.0" layoutY="14.0" text="SETTING">
-         <font>
-            <Font size="72.0" />
-         </font>
-      </Label>
+
+      <!-- Aiming Label -->
       <Label layoutX="40.0" layoutY="330.0" text="AIMING:">
          <font>
-            <Font size="36.0" />
+            <Font size="24.0" />
          </font>
       </Label>
+
+      <!-- Save Label -->
       <Label layoutX="61.0" layoutY="424.0" text="SAVE:">
          <font>
-            <Font size="36.0" />
+            <Font size="24.0" />
          </font>
       </Label>
-      <Button fx:id="soundON" layoutX="200.0" layoutY="240.0" mnemonicParsing="false" onAction="#soundOn" text="ON" />
-      <Button layoutX="270.0" layoutY="240.0" mnemonicParsing="false" onAction="#soundOff" text="OFF" />
-      <Button layoutX="200.0" layoutY="339.0" mnemonicParsing="false" onAction="#AimOn" text="ON" />
-      <Button layoutX="270.0" layoutY="339.0" mnemonicParsing="false" onAction="#AimOff" text="OFF" />
-      <Button layoutX="200.0" layoutY="438.0" mnemonicParsing="false" onAction="#saveOn" text="ON" />
-      <Button layoutX="270.0" layoutY="438.0" mnemonicParsing="false" onAction="#saveOff" text="OFF" />
-      <Button layoutX="123.0" layoutY="539.0" mnemonicParsing="false" onAction="#switchToMainMenu" text="CLOSE">
+
+      <!-- Sound Buttons -->
+      <Button fx:id="soundON" layoutX="197.0" layoutY="232.0" mnemonicParsing="false" onAction="#soundOn" prefHeight="30.0" prefWidth="60.0" style="-fx-background-color: #43adb7; -fx-text-fill: white;" text="ON" />
+      <Button layoutX="270.0" layoutY="232.0" mnemonicParsing="false" onAction="#soundOff" prefHeight="30.0" prefWidth="60.0" style="-fx-background-color: #43adb7; -fx-text-fill: white;" text="OFF" />
+
+      <!-- Aiming Buttons -->
+      <Button layoutX="197.0" layoutY="332.0" mnemonicParsing="false" onAction="#AimOn" prefHeight="30.0" prefWidth="60.0" style="-fx-background-color: #43adb7; -fx-text-fill: white;" text="ON" />
+      <Button layoutX="270.0" layoutY="332.0" mnemonicParsing="false" onAction="#AimOff" prefHeight="30.0" prefWidth="60.0" style="-fx-background-color: #43adb7; -fx-text-fill: white;" text="OFF" />
+
+      <!-- Save Buttons -->
+      <Button layoutX="197.0" layoutY="426.0" mnemonicParsing="false" onAction="#saveOn" prefHeight="30.0" prefWidth="60.0" style="-fx-background-color: #43adb7; -fx-text-fill: white;" text="ON" />
+      <Button layoutX="270.0" layoutY="426.0" mnemonicParsing="false" onAction="#saveOff" prefHeight="30.0" prefWidth="60.0" style="-fx-background-color: #43adb7; -fx-text-fill: white;" text="OFF" />
+
+      <!-- Close Button -->
+      <Button layoutX="123.0" layoutY="539.0" mnemonicParsing="false" onAction="#switchToMainMenu" prefHeight="30.0" prefWidth="104.0" style="-fx-background-color: #43adb7; -fx-text-fill: white;" text="CLOSE">
          <font>
-            <Font size="24.0" />
+            <Font size="14.0" />
          </font>
       </Button>
    </children>

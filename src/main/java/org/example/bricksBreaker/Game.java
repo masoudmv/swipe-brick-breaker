@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -30,13 +31,14 @@ import static org.example.bricksBreaker.Aim.*;
 import static org.example.bricksBreaker.Ball.ballsList;
 import static org.example.bricksBreaker.Ball.power;
 import static org.example.bricksBreaker.Brick.*;
-import static org.example.bricksBreaker.Main.saveRecords;
-import static org.example.bricksBreaker.Main.showAim;
+import static org.example.bricksBreaker.Main.*;
 import static org.example.bricksBreaker.RegularItem.*;
 import static org.example.bricksBreaker.gameOverController.yourScore;
+import static org.example.bricksBreaker.gamePreparationController.defaultBrickVel;
 
 
 public class Game {
+
     static boolean earthquakeInProgress = false;
     static boolean colorDanceInProgress = false;
     static boolean speedInProgress = false;
@@ -51,6 +53,7 @@ public class Game {
     static double  ballStartLocationX;
     static double ballStartLocationY;
     static boolean dizzinessInProgress = false;
+    static boolean strengthInProgress = false;
 
 
     private Circle firstCircle;
@@ -80,11 +83,18 @@ public class Game {
         speedInProgress = false;
         dizzinessInProgress = false;
         addNewBall = false;
+//        speedInProgress = false;
+        strengthInProgress = false;
+        newBallGenerator = 0;
 
         colorD = false;
         anim = false;
         firstBallHitTheBottom = false;
         Ball.numberOfBalls = 0;
+        ballsList.clear();
+        bricksList.clear();
+        regularItems.clear();
+
 
         primaryStage = (Stage) pane.getScene().getWindow();
         primaryStage.close();
@@ -129,6 +139,8 @@ public class Game {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } if (score < maxRecord){
+            maxRecord = score;
         }
         stage.show();
     }
@@ -185,7 +197,10 @@ public class Game {
     AtomicInteger ro = new AtomicInteger(1);
     Timeline brickGenerator = new Timeline(new KeyFrame(Duration.millis(2000), event -> {
         generatorOfBricksInARow(scene, pane, ro.get());
-        ro.getAndIncrement();
+        for (int i = 0; i < brickIncrement; i++) {
+            ro.getAndIncrement();
+        }
+
 
     }));
 
@@ -256,7 +271,9 @@ public class Game {
 
 
             if (bottomBorder && Ball.numberOfBalls ==1 && b.inMotion) {
+
                 brickJump();
+
 
                 anim = false;
                 line.setVisible(true);
@@ -267,18 +284,47 @@ public class Game {
                 b.velY = 0;
                 b.velX = 0;
                 b.inMotion = false;
-                brickGenerator.play();
 
-                brickVel = 0.4;
+                brickVel = defaultBrickVel;
                 ballStartLocationX = b.circle.getTranslateX();
                 ballStartLocationY = b.circle.getTranslateY();
                 firstCircle = b.circle;
                 firstBallHitTheBottom = true;
                 anim = false;
 
-                pane.getChildren().add(generateRandomItem());
+//                pane.getChildren().add(generateRandomItem());
 
 
+                //                ToDO run these two lines with a 500 milliseconds delay
+//                generatorOfBricksInARow(scene, pane, ro.get());
+//                ro.getAndIncrement();
+
+                Platform.runLater(() -> {
+                    pane.getChildren().add(generateRandomItem());
+                });
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        Platform.runLater(() -> {
+                            // Your specified lines of code to run after 500 milliseconds
+                            generatorOfBricksInARow(scene, pane, ro.get());
+                            for (int i = 0; i < brickIncrement; i++) {
+                                ro.getAndIncrement();
+                            }
+                        });
+                    }
+                }, 500); // Delay in milliseconds
+
+
+
+
+                Timer t = new Timer();
+                t.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        brickGenerator.play();
+                    }
+                },251);
 
                 Timer timer = new Timer();
                 timer.schedule(new TimerTask() {
@@ -287,7 +333,6 @@ public class Game {
 
                         scene.setOnMouseClicked(e -> {
                             try {
-
                                 handleMouseClick(e.getX(), e.getY(), line, pane);
                             } catch (InterruptedException ex) {
                                 throw new RuntimeException(ex);
@@ -308,6 +353,7 @@ public class Game {
                 b.velX = 0;
 
             }  if (bottomBorder && firstBallHitTheBottom && Ball.ballsHitTheBottom+1 == Ball.numberOfBalls&& b.inMotion) {
+
                 brickJump();
 
                 b.circle.setTranslateY(ballStartLocationY);
@@ -317,12 +363,44 @@ public class Game {
                 b.velY = 0;
                 b.velX = 0;
 
-                brickGenerator.play();
+
                 line.setVisible(true);
 //                bricksMotion.play();
-                brickVel = 0.4;
+                brickVel =defaultBrickVel;
                 anim = false;
-                pane.getChildren().add(generateRandomItem());
+//                pane.getChildren().add(generateRandomItem());
+
+//                ToDO run these two lines with a 500 milliseconds delay
+//                generatorOfBricksInARow(scene, pane, ro.get());
+//                ro.getAndIncrement();
+                Platform.runLater(() -> {
+                    pane.getChildren().add(generateRandomItem());
+                });
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        Platform.runLater(() -> {
+                            // Your specified lines of code to run after 500 milliseconds
+                            generatorOfBricksInARow(scene, pane, ro.get());
+                            for (int i = 0; i < brickIncrement; i++) {
+                                ro.getAndIncrement();
+                            }
+                        });
+                    }
+                }, 500); // Delay in milliseconds
+
+
+
+                Timer t = new Timer();
+                t.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        brickGenerator.play();
+                    }
+                },251);
+
+
+
                 Timer timer = new Timer();
                 timer.schedule(new TimerTask() {
                     @Override
@@ -332,6 +410,7 @@ public class Game {
                             try {
 
                                 handleMouseClick(e.getX(), e.getY(), line, pane);
+
                             } catch (InterruptedException ex) {
                                 throw new RuntimeException(ex);
                             }
@@ -434,6 +513,7 @@ public class Game {
 
     Timeline bricksMotion = new Timeline();
     KeyFrame keyFrame = new KeyFrame(Duration.millis(16.63), event -> {
+//        System.out.println(brickVel);
         for (RegularItem i : regularItems){
             i.circle.setCenterY(i.circle.getCenterY() + brickVel);
         }
@@ -464,6 +544,7 @@ public class Game {
 
 
     public Game(Event event) throws InterruptedException, IOException {
+        newBallGenerator = 0;
 
         pane = new Pane();
 
@@ -597,6 +678,10 @@ public class Game {
             timer.play();
             animation.play();
             pauseButton.setText("pause");
+            resumeStrength();
+            resumeSpeed();
+            colorDance.play();
+//            resumeSpeed();
 //            speedItem.notify();
             line.setVisible(true);
             if (colorD){
@@ -613,6 +698,9 @@ public class Game {
             colorDance.pause();
             timer.pause();
             animation.pause();
+            colorDance.pause();
+            pauseSpeed();
+            pauseStrength();
             line.setVisible(false);
             isPaused = true;
         }

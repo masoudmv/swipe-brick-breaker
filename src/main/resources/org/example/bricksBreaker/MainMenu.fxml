@@ -7,26 +7,35 @@
 
 <AnchorPane fx:id="scenePane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.bricksBreaker.SceneController">
    <children>
-      <Label layoutX="55.0" layoutY="83.0" text="Main menu" textFill="#43adb7">
+      <Label layoutX="51.0" layoutY="105.0" text="Main Menu" textFill="#ffcc00">
          <font>
-            <Font size="48.0" />
+            <Font name="Arial Black" size="42.0" />
          </font>
       </Label>
-      <Button layoutX="104.0" layoutY="195.0" mnemonicParsing="false" onAction="#switchToGamePreparation" prefHeight="71.0" prefWidth="141.0" text="New Game">
+      <Button layoutX="116.0" layoutY="288.0" mnemonicParsing="false" onAction="#switchToGamePreparation" prefHeight="0.0" prefWidth="104.0" style="-fx-background-color: #43adb7; -fx-text-fill: white;" text="New Game">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button layoutX="83.0" layoutY="364.0" mnemonicParsing="false" onAction="#gamesHistory" prefHeight="0.0" prefWidth="170.0" style="-fx-background-color: #43adb7; -fx-text-fill: white;" text="History of Records">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button layoutX="127.0" layoutY="431.0" mnemonicParsing="false" onAction="#switchToSetting" prefHeight="0.0" prefWidth="82.0" style="-fx-background-color: #43adb7; -fx-text-fill: white;" text="Settings">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button fx:id="exit" layoutX="138.0" layoutY="504.0" mnemonicParsing="false" onAction="#exit" prefHeight="0.0" prefWidth="60.0" style="-fx-background-color: #43adb7; -fx-text-fill: white;" text="Exit">
          <font>
             <Font size="18.0" />
-         </font></Button>
-      <Button layoutX="75.0" layoutY="306.0" mnemonicParsing="false" onAction="#gamesHistory" prefHeight="64.0" prefWidth="197.0" text="History of Records">
+         </font>
+      </Button>
+      <Label layoutX="88.0" layoutY="208.0" text="Record:">
          <font>
-            <Font size="18.0" />
-         </font></Button>
-      <Button layoutX="113.0" layoutY="401.0" mnemonicParsing="false" onAction="#switchToSetting" prefHeight="51.0" prefWidth="122.0" text="Setting ">
-         <font>
-            <Font size="18.0" />
-         </font></Button>
-      <Button fx:id="exit" layoutX="114.0" layoutY="494.0" mnemonicParsing="false" onAction="#exit" prefHeight="35.0" prefWidth="121.0" text="Exit">
-         <font>
-            <Font size="24.0" />
-         </font></Button>
+            <Font size="25.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

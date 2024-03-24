@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -38,10 +39,12 @@ public class SettingController {
 
     public void switchToMainMenu(ActionEvent event) throws IOException {
 
-        root = FXMLLoader.load(getClass().getResource("MainMenu.fxml"));
+        Pane root = FXMLLoader.load(getClass().getResource("MainMenu.fxml"));
 
         stage = (Stage)((Node) event.getSource()).getScene().getWindow();
         scene = new Scene(root);
+
+        Main.updateRecord( root);
         stage.setScene(scene);
         stage.show();
 

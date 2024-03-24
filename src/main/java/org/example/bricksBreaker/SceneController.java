@@ -16,11 +16,14 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+
+import static org.example.bricksBreaker.Main.maxRecord;
 
 
 public class SceneController {
@@ -30,6 +33,39 @@ public class SceneController {
     private Stage stage;
     private Scene scene;
     private Parent root;
+
+    @FXML
+    public Label rec;
+
+    public SceneController() {
+
+        try (FileReader reader = new FileReader("saves.json")) {
+            Gson gson = new Gson();
+            Player[] playersArray = gson.fromJson(reader, Player[].class);
+            maxRecord = 0;
+            for (Player p : playersArray){
+                if(maxRecord < p.score){
+                    maxRecord = p.score;
+//                    System.out.println(p.score);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } rec = new Label();
+
+        rec.setTextFill(Color.BLACK);
+
+        rec.setText("");
+    }
+
+
+//    @FXML
+//    private Label rec;
+
+    // Method to update the label text
+    public void updateLabelText(String text) {
+        rec.setText(text);
+    }
 
 
 

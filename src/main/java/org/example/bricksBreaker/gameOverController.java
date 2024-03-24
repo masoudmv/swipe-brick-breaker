@@ -7,6 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -44,7 +45,8 @@ public class gameOverController {
 
     @FXML
     void mainMenu(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("MainMenu.fxml"));
+        Pane root = FXMLLoader.load(getClass().getResource("MainMenu.fxml"));
+        Main.updateRecord( root);
 
         stage = (Stage)((Node) event.getSource()).getScene().getWindow();
         scene = new Scene(root);
